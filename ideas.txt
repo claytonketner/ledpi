@@ -1,0 +1,5 @@
+Temperature:
+  - Change color with temp - blue: cold, red: hot
+
+Clock face:
+  - Background with game of life or circular "explosions"
