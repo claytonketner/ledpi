@@ -1,0 +1,25 @@
+# This Makefile is executed on the remote host
+DIR=~/ledpi
+CLOCKPI_DIR=$(DIR)/clockpi
+VIRTUAL_ENV?=$(CLOCKPI_DIR)/venv
+VENV_ACTIVATE=$(VIRTUAL_ENV)/bin/activate
+WITH_VENV=. $(VENV_ACTIVATE);
+PY_REQS=$(CLOCKPI_DIR)/requirements.txt
+
+.PHONY: all
+all: $(VIRTUAL_ENV) $(VENV_ACTIVATE) rgbmatrix
+
+$(VIRTUAL_ENV):
+	virtualenv $(VIRTUAL_ENV)
+
+$(VENV_ACTIVATE): $(PY_REQS)
+	$(WITH_VENV) pip install -r $(PY_REQS)
+	touch $@
+
+rpi-rgb-led-matrix:
+	git clone git@github.com:hzeller/rpi-rgb-led-matrix.git
+
+rgbmatrix: rpi-rgb-led-matrix
+	make -C rpi-rgb-led-matrix
+	make -C rpi-rgb-led-matrix build-python
+	$(WITH_VENV) make -C rpi-rgb-led-matrix install-python

@@ -1,13 +1,12 @@
 TARGET=clayton@ledpi.local
-DIR=~/ledpi/
-VIRTUAL_ENV?=venv
+DIR=~/ledpi
 
-.PHONY: all push requirements
+.PHONY: all push remote
 
-all: push
+all: push remote
 
 push:
-	rsync -r --exclude={$(VIRTUAL_ENV),Makefile} * $(TARGET):$(DIR)
+	rsync -rt * $(TARGET):$(DIR)
 
-requirements: push
-	ssh $(TARGET) 'cd $(DIR) && source $(VENV)/bin/activate && pip install -r requirements.txt'
+remote: push
+	ssh $(TARGET) 'cd $(DIR) && make -f RemoteMakefile'
