@@ -13,7 +13,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC=""
 NAME=ledpi
-PROCESS_TO_KILL="python ledpi/main.py"
+PROCESS_TO_KILL="python clockpi/main.py"
 DAEMON=/usr/local/bin/$NAME
 DAEMON_ARGS=""
 PIDFILE=/var/run/$NAME.pid
