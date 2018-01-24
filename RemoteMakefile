@@ -5,6 +5,7 @@ VIRTUAL_ENV?=$(CLOCKPI_DIR)/venv
 VENV_ACTIVATE=$(VIRTUAL_ENV)/bin/activate
 WITH_VENV=. $(VENV_ACTIVATE);
 PY_REQS=$(CLOCKPI_DIR)/requirements.txt
+DAEMON_DIR=$(DIR)/daemon
 
 .PHONY: all
 all: $(VIRTUAL_ENV) $(VENV_ACTIVATE) rgbmatrix
@@ -23,3 +24,13 @@ rgbmatrix: rpi-rgb-led-matrix
 	make -C rpi-rgb-led-matrix
 	make -C rpi-rgb-led-matrix build-python
 	$(WITH_VENV) make -C rpi-rgb-led-matrix install-python
+
+.PHONY: daemon
+daemon:
+	sudo cp $(DAEMON_DIR)/bin/* /usr/local/bin/
+	sudo cp $(DAEMON_DIR)/init.d/* /etc/init.d/
+	sudo update-rc.d ledpi defaults
+
+.PHONY: restart
+restart:
+	sudo service ledpi restart

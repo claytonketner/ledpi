@@ -1,0 +1,9 @@
+#!/bin/bash
+
+logfile=/var/log/ledpi.log
+touch $logfile
+cd /home/clayton/ledpi/clockpi
+source venv/bin/activate
+export PYTHONPATH=$PYTHONPATH:$PWD/clockpi
+echo "Starting main..." >> $logfile
+python clockpi/main.py --run-forever >>$logfile 2>&1
