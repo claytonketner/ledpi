@@ -17,6 +17,7 @@ def display_clock(clock_info={}, update_freq=0.2):
     """
     if not update_clock_info(clock_info, update_freq):
         return None
+    # Force things
     if clock_info['show_sunrise']:
         matrix = get_animated_sun(clock_info['sunrise_anim_pct'], True)
     elif clock_info['show_sunset']:
@@ -31,5 +32,5 @@ def display_clock(clock_info={}, update_freq=0.2):
     else:
         clockface = config_to_matrix(LARGE_WITH_TEMPERATURE_CONFIG, clock_info,
                                      color=clock_info['color'])
-    add_to_matrix(clockface, matrix, 0, 0, transpose=False, bit_xor=True)
+    add_to_matrix(clockface, matrix, 0, 0, transpose=False, bit_or=False)
     return matrix

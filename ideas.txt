@@ -3,3 +3,6 @@ Temperature:
 
 Clock face:
   - Background with game of life or circular "explosions"
+
+General:
+  - Indicator when weather or traffic is being updated

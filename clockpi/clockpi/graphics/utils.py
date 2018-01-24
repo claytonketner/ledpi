@@ -12,6 +12,7 @@ from clockpi.constants import SUN_ANIM_GROWTH
 from clockpi.constants import SUN_ANIM_TRAVEL
 from clockpi.external import get_traffic
 from clockpi.external import get_weather
+from clockpi.graphics.color_utils import set_brightness
 from clockpi.secret import DIRECTIONS_END_HOUR
 from clockpi.secret import DIRECTIONS_START_HOUR
 
@@ -81,7 +82,10 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, transpose=True,
                 final_val = [max(z) for z in zip(matrix_val, pm_val)]
             else:
                 # Just overwrite the matrix with the partial matrix
-                final_val = pm_val
+                if any(pm_val):
+                    final_val = pm_val
+                else:
+                    final_val = matrix_val
             matrix[x+xx][y+yy] = final_val
 
 
@@ -143,6 +147,9 @@ def update_clock_info(clock_info, update_freq):
     clock_info['hour_digits'] = map(int, [hour_12 / 10, hour_12 % 10])
     clock_info['minute_digits'] = map(int, [minute / 10, minute % 10])
     clock_info['second_digits'] = map(int, [second / 10, second % 10])
+    clock_info['hour'] = hour_24
+    clock_info['minute'] = minute
+    clock_info['second'] = second
     if hour_12 < 10:
         clock_info['hour_digits'][0] = 'BLANK'
     # Color
@@ -166,14 +173,14 @@ def update_clock_info(clock_info, update_freq):
         clock_info['sun_is_up'] = (clock_info['weather']['sunrise'] < now and
                                    clock_info['weather']['sunset'] > now)
         sunrise_anim_pct = (
-            (clock_info['weather']['sunrise'] - now).total_seconds() /
-            SUN_ANIMATION_DURATION)
+            1 - ((clock_info['weather']['sunrise'] - now).total_seconds() /
+                 SUN_ANIMATION_DURATION))
         clock_info['sunrise_anim_pct'] = sunrise_anim_pct
         clock_info['show_sunrise'] = (sunrise_anim_pct > 0 and
                                       sunrise_anim_pct < 1)
         sunset_anim_pct = (
-            (clock_info['weather']['sunset'] - now).total_seconds() /
-            SUN_ANIMATION_DURATION)
+            1 - ((clock_info['weather']['sunset'] - now).total_seconds() /
+                 SUN_ANIMATION_DURATION))
         clock_info['sunset_anim_pct'] = sunset_anim_pct
         clock_info['show_sunset'] = (sunset_anim_pct > 0 and
                                      sunset_anim_pct < 1)
@@ -281,7 +288,8 @@ def generate_sun_matrix(center_y, radius):
     Generates a matrix containing a horizontally centered sun. Assumes only
     the upper half of the sun is needed.
     """
-    orange = [244, 173, 66]
+    orange = [255, 174, 0]
+    orange = set_brightness(orange, 80)
     radius = int(radius)
     center_x = ARRAY_WIDTH / 2
     matrix = generate_empty_matrix()
@@ -296,13 +304,19 @@ def generate_sun_matrix(center_y, radius):
                 # Off matrix
                 continue
             # We only need the top hemisphere (quadrants 1 and 2)
-            add_to_matrix([[orange]], matrix,
+            dist_from_center = math.sqrt(abs(ii - center_x)**2 +
+                                         abs(jj - center_y)**2)
+            new_brightness = dist_from_center / radius * 100
+            if new_brightness > 100:
+                new_brightness = 100
+            current_orange = set_brightness(orange, new_brightness)
+            add_to_matrix([[current_orange]], matrix,
                           int(center_x + ii + 0.5),
                           int(center_y - jj + 0.5))
-            add_to_matrix([[orange]], matrix,
+            add_to_matrix([[current_orange]], matrix,
                           int(center_x - ii + 0.5),
                           int(center_y - jj + 0.5))
-            # Add some noise to the edges
+            # Add some noise all over and a little past the edge
             randomness = 0.1
             if random() < randomness:
                 add_to_matrix([[orange]], matrix,
@@ -319,8 +333,10 @@ def get_animated_sun(anim_pct, is_rising):
     """
     Given the current percent completion of the animation, returns an array
     of the sun showing the current frame of animation.
+
+    anim_pct: float 0.0 to 1.0
     """
-    if is_rising:
+    if not is_rising:
         anim_pct = 1 - anim_pct
     sun_diameter = SUN_ANIM_START_DIAMETER + SUN_ANIM_GROWTH * anim_pct
     sun_y = sun_diameter / 2 + ARRAY_HEIGHT - SUN_ANIM_TRAVEL * anim_pct
