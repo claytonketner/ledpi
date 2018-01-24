@@ -9,8 +9,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'hour_digits': {
         'data_name': 'hour_digits',
         'spatial': {
-            'origin_x': 1,
-            'origin_y': 1,
+            'origin_x': 1+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -18,8 +18,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'separator': {
         'data_name': 'separator',
         'spatial': {
-            'origin_x': 15,
-            'origin_y': 1,
+            'origin_x': 15+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -27,8 +27,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'minute_digits': {
         'data_name': 'minute_digits',
         'spatial': {
-            'origin_x': 18,
-            'origin_y': 1,
+            'origin_x': 18+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -36,8 +36,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'second_digits': {
         'data_name': 'second_digits',
         'spatial': {
-            'origin_x': 32,
-            'origin_y': 10,
+            'origin_x': 32+12,
+            'origin_y': 10+8,
             'spacing': 1,
         },
         'font': numbers_tiny,
@@ -45,8 +45,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'temp_digits': {
         'data_name': 'temp_digits',
         'spatial': {
-            'origin_x': 32,
-            'origin_y': 1,
+            'origin_x': 32+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': [numbers_tiny, letters_tiny, glyphs],
@@ -57,8 +57,8 @@ TRAFFIC_CONFIG = {
     'hour_digits': {
         'data_name': 'hour_digits',
         'spatial': {
-            'origin_x': 3,
-            'origin_y': 1,
+            'origin_x': 3+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -66,8 +66,8 @@ TRAFFIC_CONFIG = {
     'hour_minute_separator': {
         'data_name': 'separator',
         'spatial': {
-            'origin_x': 13,
-            'origin_y': 1,
+            'origin_x': 13+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -75,8 +75,8 @@ TRAFFIC_CONFIG = {
     'minute_digits': {
         'data_name': 'minute_digits',
         'spatial': {
-            'origin_x': 15,
-            'origin_y': 1,
+            'origin_x': 15+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -84,8 +84,8 @@ TRAFFIC_CONFIG = {
     'minute_second_separator': {
         'data_name': 'separator',
         'spatial': {
-            'origin_x': 25,
-            'origin_y': 1,
+            'origin_x': 25+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -93,8 +93,8 @@ TRAFFIC_CONFIG = {
     'minute_second_separator_2': {
         'data_name': 'separator',
         'spatial': {
-            'origin_x': 26,
-            'origin_y': 1,
+            'origin_x': 26+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -102,8 +102,8 @@ TRAFFIC_CONFIG = {
     'second_digits': {
         'data_name': 'second_digits',
         'spatial': {
-            'origin_x': 28,
-            'origin_y': 1,
+            'origin_x': 28+12,
+            'origin_y': 1+8,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -111,8 +111,8 @@ TRAFFIC_CONFIG = {
     'traffic_delta': {
         'data_name': 'traffic_delta_digits',
         'spatial': {
-            'origin_x': 3,
-            'origin_y': 9,
+            'origin_x': 3+12,
+            'origin_y': 9+8,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -120,8 +120,8 @@ TRAFFIC_CONFIG = {
     'travel_time': {
         'data_name': 'travel_time_digits',
         'spatial': {
-            'origin_x': 28,
-            'origin_y': 9,
+            'origin_x': 28+12,
+            'origin_y': 9+8,
             'spacing': 1,
         },
         'font': numbers_small,
