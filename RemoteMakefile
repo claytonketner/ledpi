@@ -34,3 +34,7 @@ daemon:
 .PHONY: restart
 restart:
 	sudo service ledpi restart
+
+.PHONY: logs
+logs:
+	sudo tail -F /var/log/ledpi.log

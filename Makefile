@@ -20,3 +20,7 @@ daemon: push
 .PHONY: restart
 restart:
 	ssh -t $(TARGET) 'cd $(DIR) && make -f RemoteMakefile $@'
+
+.PHONY: logs
+logs:
+	ssh -t $(TARGET) 'cd $(DIR) && make -f RemoteMakefile $@'
