@@ -9,8 +9,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'hour_digits': {
         'data_name': 'hour_digits',
         'spatial': {
-            'origin_x': 1+12,
-            'origin_y': 1+8,
+            'origin_x': 12,
+            'origin_y': 8,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -18,8 +18,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'separator': {
         'data_name': 'separator',
         'spatial': {
-            'origin_x': 15+12,
-            'origin_y': 1+8,
+            'origin_x': 26,
+            'origin_y': 8,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -27,8 +27,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'minute_digits': {
         'data_name': 'minute_digits',
         'spatial': {
-            'origin_x': 18+12,
-            'origin_y': 1+8,
+            'origin_x': 29,
+            'origin_y': 8,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -36,8 +36,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'second_digits': {
         'data_name': 'second_digits',
         'spatial': {
-            'origin_x': 32+12,
-            'origin_y': 10+8,
+            'origin_x': 43,
+            'origin_y': 17,
             'spacing': 1,
         },
         'font': numbers_tiny,
@@ -45,8 +45,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'temp_digits': {
         'data_name': 'temp_digits',
         'spatial': {
-            'origin_x': 32+12,
-            'origin_y': 1+8,
+            'origin_x': 43,
+            'origin_y': 8,
             'spacing': 1,
         },
         'font': [numbers_tiny, letters_tiny, glyphs],
@@ -57,62 +57,53 @@ TRAFFIC_CONFIG = {
     'hour_digits': {
         'data_name': 'hour_digits',
         'spatial': {
-            'origin_x': 3+12,
-            'origin_y': 1+8,
+            'origin_x': 12,
+            'origin_y': 8,
             'spacing': 1,
         },
-        'font': numbers_small,
+        'font': numbers_large,
     },
-    'hour_minute_separator': {
+    'separator': {
         'data_name': 'separator',
         'spatial': {
-            'origin_x': 13+12,
-            'origin_y': 1+8,
+            'origin_x': 26,
+            'origin_y': 8,
             'spacing': 1,
         },
-        'font': numbers_small,
+        'font': numbers_large,
     },
     'minute_digits': {
         'data_name': 'minute_digits',
         'spatial': {
-            'origin_x': 15+12,
-            'origin_y': 1+8,
+            'origin_x': 29,
+            'origin_y': 8,
             'spacing': 1,
         },
-        'font': numbers_small,
-    },
-    'minute_second_separator': {
-        'data_name': 'separator',
-        'spatial': {
-            'origin_x': 25+12,
-            'origin_y': 1+8,
-            'spacing': 1,
-        },
-        'font': numbers_small,
-    },
-    'minute_second_separator_2': {
-        'data_name': 'separator',
-        'spatial': {
-            'origin_x': 26+12,
-            'origin_y': 1+8,
-            'spacing': 1,
-        },
-        'font': numbers_small,
+        'font': numbers_large,
     },
     'second_digits': {
         'data_name': 'second_digits',
         'spatial': {
-            'origin_x': 28+12,
-            'origin_y': 1+8,
+            'origin_x': 43,
+            'origin_y': 17,
             'spacing': 1,
         },
-        'font': numbers_small,
+        'font': numbers_tiny,
+    },
+    'temp_digits': {
+        'data_name': 'temp_digits',
+        'spatial': {
+            'origin_x': 43,
+            'origin_y': 8,
+            'spacing': 1,
+        },
+        'font': [numbers_tiny, letters_tiny, glyphs],
     },
     'traffic_delta': {
         'data_name': 'traffic_delta_digits',
         'spatial': {
-            'origin_x': 3+12,
-            'origin_y': 9+8,
+            'origin_x': 54,
+            'origin_y': 25,
             'spacing': 1,
         },
         'font': numbers_small,
@@ -120,8 +111,8 @@ TRAFFIC_CONFIG = {
     'travel_time': {
         'data_name': 'travel_time_digits',
         'spatial': {
-            'origin_x': 28+12,
-            'origin_y': 9+8,
+            'origin_x': 54,
+            'origin_y': 18,
             'spacing': 1,
         },
         'font': numbers_small,

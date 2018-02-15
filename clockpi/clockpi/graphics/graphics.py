@@ -22,7 +22,7 @@ def display_clock(clock_info={}, update_freq=0.2):
     elif clock_info['show_sunset']:
         matrix = get_animated_sun(clock_info['sunset_anim_pct'], False)
     elif clock_info['sun_is_up']:
-        matrix = generate_empty_matrix(clock_info['color'])
+        matrix = generate_empty_matrix()
     else:
         matrix = generate_empty_matrix()
     if clock_info['show_traffic']:

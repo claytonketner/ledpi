@@ -26,8 +26,10 @@ if __name__ == '__main__':
 
     options = RGBMatrixOptions()
     options.rows = 32
+    options.cols = 32
     options.chain_length = 2
     options.parallel = 1
+    options.multiplexing = 0
     options.hardware_mapping = 'adafruit-hat-pwm'
     driver = RGBMatrix(options=options)
 
