@@ -6,6 +6,7 @@ from clockpi.secret import DIRECTIONS_DESTINATION
 from clockpi.secret import DIRECTIONS_ORIGIN
 from clockpi.secret import GMAPS_DIRECTIONS_API_KEY
 from clockpi.secret import WU_ASTRO_URL
+from clockpi.secret import WU_FORECAST_URL
 from clockpi.secret import WU_WEATHER_URL
 
 
@@ -23,8 +24,10 @@ def get_weather(last_update_time, weather={}, cache_minutes=10):
     if passed_minutes >= cache_minutes:
         try:
             wu_weather = requests.get(WU_WEATHER_URL).json()
+            wu_forecast = requests.get(WU_FORECAST_URL).json()
             wu_astro = requests.get(WU_ASTRO_URL).json()
-            current_temp = wu_weather['current_observation']['feelslike_f']
+            current_weather = wu_weather['current_observation']
+            current_temp = current_weather['feelslike_f']
             weather['current_temp'] = float(current_temp)
             sun_info = wu_astro['sun_phase']
             now = datetime.now()
@@ -34,6 +37,11 @@ def get_weather(last_update_time, weather={}, cache_minutes=10):
             weather['sunset'] = datetime(now.year, now.month, now.day,
                                          int(sun_info['sunset']['hour']),
                                          int(sun_info['sunset']['minute']))
+            todays_forecast = (wu_forecast['forecast']['txt_forecast']['forecastday']
+                               [0])
+            # Weather state - look up 'phrase glossary' on wunderground's api
+            # website
+            weather['state'] = current_weather['weather']
         except Exception as e:
             print e.message
             weather = {}

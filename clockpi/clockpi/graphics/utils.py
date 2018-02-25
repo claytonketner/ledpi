@@ -1,9 +1,11 @@
 import math
+import time
 
 from datetime import datetime
 from random import random
 from types import ModuleType
 
+from clockpi.alphanum import glyphs
 from clockpi.constants import ARRAY_HEIGHT
 from clockpi.constants import ARRAY_WIDTH
 from clockpi.constants import SUN_ANIMATION_DURATION
@@ -208,6 +210,8 @@ def update_clock_info(clock_info, update_freq):
                       clock_info['traffic']['travel_time'] % 10])
     clock_info['show_traffic'] = (clock_info['show_traffic'] and
                                   clock_info.get('traffic'))
+    # TODO: use sunset/sunrise and clock_info['weather']['state']
+    clock_info['sunshine_anim'] = int(time.time()) % len(glyphs.SHINING_SUN)
     # Special cases
     clock_info['separator'] = ['SEPARATOR']
     return True
@@ -236,8 +240,11 @@ def data_to_alphanums(data_list, alphanum_source):
         name of a variable in the module
     """
     alphanum_list = []
+    if type(data_list) not in (list, tuple):
+        # Just a single item
+        data_list = [data_list]
     for item in data_list:
-        if isinstance(item, int) and isinstance(alphanum_source, list):
+        if isinstance(item, int) and type(alphanum_source) in (tuple, list):
             alphanum_list.append(alphanum_source[item])
         elif isinstance(item, int) and isinstance(alphanum_source, ModuleType):
             alphanum_list.append(alphanum_source.ALL_NUMBERS[item])
@@ -253,33 +260,43 @@ def data_to_alphanums(data_list, alphanum_source):
 
 def config_to_matrix(config, data, color):
     """
-    Takes a configuration and data and generates a matrix using the two. There
-    is a special case where you can provide a list of fonts instead of a single
-    font. In this case, each item in the list will be tried and the first one
-    that works will be used.
+    Takes a configuration and data and generates a matrix using the two.
+
+    If your config contains 'font_choices' each item in the list will be tried
+    and the first one that works will be used.
+
+    The config can also a matrix under the key 'item', in case you just want to
+    add a static image.
     """
     matrix = generate_empty_matrix()
     for group_name, group_config in config.iteritems():
-        data_name = group_config['data_name']
-        if data_name not in data:
-            print "{} not in the data given".format(data_name)
-            continue
-        group_data = data[data_name]
-        font = group_config['font']
-        if isinstance(font, list):
-            for font_choice in font:
-                try:
-                    group_display = data_to_alphanums(group_data, font_choice)
-                    break
-                except Exception:
-                    pass
-            else:
-                raise ValueError("None of the font choices for {} "
-                                 "worked.".format(group_name))
+        if 'item' in group_config:
+            group_display = [group_config['item']]
         else:
-            group_display = data_to_alphanums(group_data, font)
-        add_items_to_matrix(group_display, matrix, color=color,
-                            **group_config['spatial'])
+            data_name = group_config['data_name']
+            if data_name in data:
+                group_data = data[data_name]
+            else:
+                print "{} not in the data given".format(data_name)
+                continue
+            if 'font_choices' in group_config:
+                font_choices = group_config['font_choices']
+                for font_choice in font_choices:
+                    try:
+                        group_display = data_to_alphanums(group_data,
+                                                          font_choice)
+                        break
+                    except Exception:
+                        pass
+                else:
+                    raise ValueError("None of the font choices for {} "
+                                     "worked.".format(group_name))
+            else:
+                group_display = data_to_alphanums(group_data,
+                                                  group_config['font'])
+        spatial = group_config['spatial']
+        spatial.setdefault('spacing', 0)
+        add_items_to_matrix(group_display, matrix, color=color, **spatial)
     return matrix
 
 

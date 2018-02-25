@@ -9,8 +9,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'hour_digits': {
         'data_name': 'hour_digits',
         'spatial': {
-            'origin_x': 12,
-            'origin_y': 8,
+            'origin_x': 1,
+            'origin_y': 17,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -18,17 +18,17 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'separator': {
         'data_name': 'separator',
         'spatial': {
-            'origin_x': 26,
-            'origin_y': 8,
-            'spacing': 1,
+            'origin_x': 15,
+            'origin_y': 17,
+            'spacing': 0,
         },
         'font': numbers_large,
     },
     'minute_digits': {
         'data_name': 'minute_digits',
         'spatial': {
-            'origin_x': 29,
-            'origin_y': 8,
+            'origin_x': 18,
+            'origin_y': 17,
             'spacing': 1,
         },
         'font': numbers_large,
@@ -36,8 +36,8 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'second_digits': {
         'data_name': 'second_digits',
         'spatial': {
-            'origin_x': 43,
-            'origin_y': 17,
+            'origin_x': 32,
+            'origin_y': 26,
             'spacing': 1,
         },
         'font': numbers_tiny,
@@ -45,60 +45,31 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'temp_digits': {
         'data_name': 'temp_digits',
         'spatial': {
-            'origin_x': 43,
-            'origin_y': 8,
+            'origin_x': 51,
+            'origin_y': 2,
             'spacing': 1,
         },
-        'font': [numbers_tiny, letters_tiny, glyphs],
+        'font_choices': [numbers_tiny, letters_tiny, glyphs],
+    },
+    'temp_deg_symbol': {
+        'item': glyphs.DEGREE,
+        'spatial': {
+            'origin_x': 59,
+            'origin_y': 1,
+            'spacing': 1,
+        },
+    },
+    'sun': {
+        'data_name': 'sunshine_anim',
+        'spatial': {
+            'origin_x': 47,
+            'origin_y': 8,
+        },
+        'font': glyphs.SHINING_SUN
     },
 }
 
 TRAFFIC_CONFIG = {
-    'hour_digits': {
-        'data_name': 'hour_digits',
-        'spatial': {
-            'origin_x': 12,
-            'origin_y': 8,
-            'spacing': 1,
-        },
-        'font': numbers_large,
-    },
-    'separator': {
-        'data_name': 'separator',
-        'spatial': {
-            'origin_x': 26,
-            'origin_y': 8,
-            'spacing': 1,
-        },
-        'font': numbers_large,
-    },
-    'minute_digits': {
-        'data_name': 'minute_digits',
-        'spatial': {
-            'origin_x': 29,
-            'origin_y': 8,
-            'spacing': 1,
-        },
-        'font': numbers_large,
-    },
-    'second_digits': {
-        'data_name': 'second_digits',
-        'spatial': {
-            'origin_x': 43,
-            'origin_y': 17,
-            'spacing': 1,
-        },
-        'font': numbers_tiny,
-    },
-    'temp_digits': {
-        'data_name': 'temp_digits',
-        'spatial': {
-            'origin_x': 43,
-            'origin_y': 8,
-            'spacing': 1,
-        },
-        'font': [numbers_tiny, letters_tiny, glyphs],
-    },
     'traffic_delta': {
         'data_name': 'traffic_delta_digits',
         'spatial': {
@@ -118,3 +89,4 @@ TRAFFIC_CONFIG = {
         'font': numbers_small,
     },
 }
+TRAFFIC_CONFIG.update(LARGE_WITH_TEMPERATURE_CONFIG)
