@@ -43,7 +43,7 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'temp_digits': {
         'data_name': 'temp_digits',
         'spatial': {
-            'origin_x': 51,
+            'origin_x': 52,
             'origin_y': 2,
             'spacing': 1,
         },
@@ -52,14 +52,14 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
     'temp_deg_symbol': {
         'item': glyphs.DEGREE,
         'spatial': {
-            'origin_x': 59,
+            'origin_x': 60,
             'origin_y': 1,
         },
     },
     'sun': {
         'data_name': 'sunshine_anim',
         'spatial': {
-            'origin_x': 47,
+            'origin_x': 48,
             'origin_y': 8,
         },
         'font': glyphs.SHINING_SUN

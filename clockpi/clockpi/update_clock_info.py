@@ -116,6 +116,5 @@ def update_clock_info(clock_info, update_freq):
     update_time(clock_info, now)
     update_color(clock_info, now)
     update_weather(clock_info, now)
-    # Traffic
     update_traffic(clock_info, now)
     return True
