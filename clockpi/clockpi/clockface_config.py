@@ -16,13 +16,11 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
         'font': numbers_large,
     },
     'separator': {
-        'data_name': 'separator',
+        'item': numbers_large.SEPARATOR,
         'spatial': {
             'origin_x': 15,
             'origin_y': 17,
-            'spacing': 0,
         },
-        'font': numbers_large,
     },
     'minute_digits': {
         'data_name': 'minute_digits',
@@ -56,7 +54,6 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
         'spatial': {
             'origin_x': 59,
             'origin_y': 1,
-            'spacing': 1,
         },
     },
     'sun': {

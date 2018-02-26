@@ -214,10 +214,8 @@ def update_clock_info(clock_info, update_freq):
                       clock_info['traffic']['travel_time'] % 10])
     clock_info['show_traffic'] = (clock_info['show_traffic'] and
                                   clock_info.get('traffic'))
-    # TODO: use sunset/sunrise and clock_info['weather']['state']
     clock_info['sunshine_anim'] = int(time.time()) % len(glyphs.SHINING_SUN)
-    # Special cases
-    clock_info['separator'] = ['SEPARATOR']
+    # TODO: use sunset/sunrise and clock_info['weather']['state']
     return True
 
 
