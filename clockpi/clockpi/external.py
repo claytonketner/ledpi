@@ -37,11 +37,11 @@ def get_weather(last_update_time, weather={}, cache_minutes=10):
             weather['sunset'] = datetime(now.year, now.month, now.day,
                                          int(sun_info['sunset']['hour']),
                                          int(sun_info['sunset']['minute']))
-            todays_forecast = (wu_forecast['forecast']['txt_forecast']['forecastday']
-                               [0])
+            todays_forecast = (wu_forecast['forecast']['txt_forecast']
+                               ['forecastday'][0])
             # Weather state - look up 'phrase glossary' on wunderground's api
             # website
-            weather['state'] = current_weather['weather']
+            weather['state'] = todays_forecast['icon']
         except Exception as e:
             print e.message
             weather = {}
