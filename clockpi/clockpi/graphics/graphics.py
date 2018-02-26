@@ -3,7 +3,7 @@ from clockpi.clockface_config import TRAFFIC_CONFIG
 from clockpi.graphics.utils import add_to_matrix
 from clockpi.graphics.utils import config_to_matrix
 from clockpi.graphics.utils import generate_empty_matrix
-from clockpi.graphics.utils import update_clock_info
+from clockpi.update_clock_info import update_clock_info
 
 
 def display_clock(clock_info={}, update_freq=0.2):
