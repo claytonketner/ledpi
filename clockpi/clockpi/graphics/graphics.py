@@ -3,7 +3,6 @@ from clockpi.clockface_config import TRAFFIC_CONFIG
 from clockpi.graphics.utils import add_to_matrix
 from clockpi.graphics.utils import config_to_matrix
 from clockpi.graphics.utils import generate_empty_matrix
-from clockpi.graphics.utils import get_animated_sun
 from clockpi.graphics.utils import update_clock_info
 
 
@@ -17,14 +16,7 @@ def display_clock(clock_info={}, update_freq=0.2):
     """
     if not update_clock_info(clock_info, update_freq):
         return None
-    if clock_info['show_sunrise']:
-        matrix = get_animated_sun(clock_info['sunrise_anim_pct'], True)
-    elif clock_info['show_sunset']:
-        matrix = get_animated_sun(clock_info['sunset_anim_pct'], False)
-    elif clock_info['sun_is_up']:
-        matrix = generate_empty_matrix()
-    else:
-        matrix = generate_empty_matrix()
+    matrix = generate_empty_matrix()
     if clock_info['show_traffic']:
         clockface = config_to_matrix(TRAFFIC_CONFIG, clock_info,
                                      color=clock_info['color'])

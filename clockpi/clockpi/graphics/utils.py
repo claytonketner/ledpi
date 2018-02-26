@@ -2,7 +2,6 @@ import math
 import time
 
 from datetime import datetime
-from random import random
 from types import ModuleType
 
 from clockpi.alphanum import glyphs
@@ -15,12 +14,8 @@ from clockpi.constants import DAILY_R_MAX
 from clockpi.constants import DAILY_G_MAX
 from clockpi.constants import DAILY_B_MAX
 from clockpi.constants import SUN_ANIMATION_DURATION
-from clockpi.constants import SUN_ANIM_START_DIAMETER
-from clockpi.constants import SUN_ANIM_GROWTH
-from clockpi.constants import SUN_ANIM_TRAVEL
 from clockpi.external import get_traffic
 from clockpi.external import get_weather
-from clockpi.graphics.color_utils import set_brightness
 from clockpi.secret import DIRECTIONS_END_HOUR
 from clockpi.secret import DIRECTIONS_START_HOUR
 
@@ -307,63 +302,3 @@ def config_to_matrix(config, data, color):
         spatial.setdefault('spacing', 0)
         add_items_to_matrix(group_display, matrix, color=color, **spatial)
     return matrix
-
-
-def generate_sun_matrix(center_y, radius):
-    """
-    Generates a matrix containing a horizontally centered sun. Assumes only
-    the upper half of the sun is needed.
-    """
-    orange = [255, 174, 0]
-    orange = set_brightness(orange, 80)
-    radius = int(radius)
-    center_x = ARRAY_WIDTH / 2
-    matrix = generate_empty_matrix()
-    for ii in xrange(radius + 1):
-        if center_x - ii < 0:
-            # Off matrix
-            continue
-        x_t = math.acos(float(ii) / radius)
-        edge_y = round(math.sin(x_t) * radius)
-        for jj in xrange(int(edge_y) + 1):
-            if center_y - jj > ARRAY_HEIGHT or center_y - jj < 0:
-                # Off matrix
-                continue
-            # We only need the top hemisphere (quadrants 1 and 2)
-            dist_from_center = math.sqrt(abs(ii - center_x)**2 +
-                                         abs(jj - center_y)**2)
-            new_brightness = dist_from_center / radius * 100
-            if new_brightness > 100:
-                new_brightness = 100
-            current_orange = set_brightness(orange, new_brightness)
-            add_to_matrix([[current_orange]], matrix,
-                          int(center_x + ii + 0.5),
-                          int(center_y - jj + 0.5))
-            add_to_matrix([[current_orange]], matrix,
-                          int(center_x - ii + 0.5),
-                          int(center_y - jj + 0.5))
-            # Add some noise all over and a little past the edge
-            randomness = 0.1
-            if random() < randomness:
-                add_to_matrix([[orange]], matrix,
-                              int(center_x + ii + 0.5),
-                              int(center_y - jj - 0.5))
-            if random() < randomness:
-                add_to_matrix([[orange]], matrix,
-                              int(center_x - ii + 0.5),
-                              int(center_y - jj - 0.5))
-    return matrix
-
-
-def get_animated_sun(anim_pct, is_rising):
-    """
-    Given the current percent completion of the animation, returns an array
-    of the sun showing the current frame of animation.
-
-    anim_pct: float 0.0 to 1.0
-    """
-    if not is_rising:
-        anim_pct = 1 - anim_pct
-    sun_diameter = SUN_ANIM_START_DIAMETER + SUN_ANIM_GROWTH * anim_pct
-    sun_y = sun_diameter / 2 + ARRAY_HEIGHT - SUN_ANIM_TRAVEL * anim_pct
-    return generate_sun_matrix(sun_y, sun_diameter / 2)
