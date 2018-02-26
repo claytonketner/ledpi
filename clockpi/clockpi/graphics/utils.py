@@ -8,6 +8,12 @@ from types import ModuleType
 from clockpi.alphanum import glyphs
 from clockpi.constants import ARRAY_HEIGHT
 from clockpi.constants import ARRAY_WIDTH
+from clockpi.constants import DAILY_R_MIN
+from clockpi.constants import DAILY_G_MIN
+from clockpi.constants import DAILY_B_MIN
+from clockpi.constants import DAILY_R_MAX
+from clockpi.constants import DAILY_G_MAX
+from clockpi.constants import DAILY_B_MAX
 from clockpi.constants import SUN_ANIMATION_DURATION
 from clockpi.constants import SUN_ANIM_START_DIAMETER
 from clockpi.constants import SUN_ANIM_GROWTH
@@ -156,9 +162,12 @@ def update_clock_info(clock_info, update_freq):
         clock_info['hour_digits'][0] = 'BLANK'
     # Color
     day_elapsed_mins = hour_24 * 60 + minute
-    red = calc_color_cos(day_elapsed_mins, 6*60, 24*60, 5, 150)
-    green = calc_color_cos(day_elapsed_mins, 6*60, 24*60, 0, 150)
-    blue = calc_color_cos(day_elapsed_mins, 6*60, 24*60, 0, 150)
+    red = calc_color_cos(day_elapsed_mins, 6*60, 24*60, DAILY_R_MIN,
+                         DAILY_R_MAX)
+    green = calc_color_cos(day_elapsed_mins, 6*60, 24*60, DAILY_G_MIN,
+                           DAILY_G_MAX)
+    blue = calc_color_cos(day_elapsed_mins, 6*60, 24*60, DAILY_B_MIN,
+                          DAILY_B_MAX)
     clock_info['color'] = (red, green, blue)
     # Weather
     clock_info['weather_update_time'], clock_info['weather'] = get_weather(
