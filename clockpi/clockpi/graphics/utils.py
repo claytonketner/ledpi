@@ -281,8 +281,7 @@ def config_to_matrix(config, data, color):
             if data_name in data:
                 group_data = data[data_name]
             else:
-                print "{} not in the data given".format(data_name)
-                continue
+                raise ValueError("{} not in the data given".format(data_name))
             if 'font_choices' in group_config:
                 font_choices = group_config['font_choices']
                 for font_choice in font_choices:
@@ -290,7 +289,7 @@ def config_to_matrix(config, data, color):
                         group_display = data_to_alphanums(group_data,
                                                           font_choice)
                         break
-                    except Exception:
+                    except NotImplementedError:
                         pass
                 else:
                     raise ValueError("None of the font choices for {} "
