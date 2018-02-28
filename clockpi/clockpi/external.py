@@ -39,9 +39,22 @@ def get_weather(last_update_time, weather={}, cache_minutes=10):
                                          int(sun_info['sunset']['minute']))
             todays_forecast = (wu_forecast['forecast']['txt_forecast']
                                ['forecastday'][0])
-            # Weather state - look up 'phrase glossary' on wunderground's api
-            # website
-            weather['state'] = todays_forecast['icon']
+            # Weather forecast - look up 'phrase glossary' on wunderground's
+            # api website
+            forecast = todays_forecast['icon']
+            # Simplify down the possible weather states
+            if forecast in ('sunny', 'mostlysunny', 'clear'):
+                weather['forecast'] = 'clear'
+            elif forecast in ('partlycloudy', 'mostlycloudy', 'partlysunny'):
+                weather['forecast'] = 'partlycloudy'
+            elif forecast in ('cloudy', 'fog'):
+                weather['forecast'] = 'cloudy'
+            elif forecast in ('rain', 'flurries', 'sleet', 'snow', 'tstorms',
+                              'chancerain', 'chanceflurries', 'chancesleet',
+                              'chancesnow', 'chancetstorms'):
+                weather['forecast'] = 'rain'
+            else:
+                weather['forecast'] = None
         except Exception as e:
             print e.message
             weather = {}

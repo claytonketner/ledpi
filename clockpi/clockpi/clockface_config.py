@@ -3,11 +3,81 @@ from clockpi.alphanum import letters_tiny
 from clockpi.alphanum import numbers_large
 from clockpi.alphanum import numbers_small
 from clockpi.alphanum import numbers_tiny
+from clockpi.alphanum import weather_animations
 
 
-LARGE_WITH_TEMPERATURE_CONFIG = {
+# The keys of this dict correspond to the possible weather forecasts
+WEATHER_ANIMATIONS = {
+    'sunny': {
+        'sunshine_animation': {
+            'data_key': 'weather_anim',
+            'spatial': {
+                'origin_x': 48,
+                'origin_y': 8,
+            },
+            'font': weather_animations.SUN_ANIMATION,
+        },
+    },
+    'moon': {
+        'moon_animation': {
+            # TODO
+            'data_key': 'weather_anim',
+            'spatial': {
+                'origin_x': 48,
+                'origin_y': 8,
+            },
+            'font': weather_animations.MOON_ANIMATION,
+        },
+    },
+    'cloudy': {
+        'cloudy_animation': {
+            # TODO
+            'data_key': 'weather_anim',
+            'spatial': {
+                'origin_x': 48,
+                'origin_y': 8,
+            },
+            'font': weather_animations.CLOUDY_ANIMATION,
+        },
+    },
+    'cloudy_sun': {
+        'cloudy_sun_animation': {
+            # TODO
+            'data_key': 'weather_anim',
+            'spatial': {
+                'origin_x': 48,
+                'origin_y': 8,
+            },
+            'font': weather_animations.CLOUDY_SUN_ANIMATION,
+        },
+    },
+    'cloudy_moon': {
+        'cloudy_moon_animation': {
+            # TODO
+            'data_key': 'weather_anim',
+            'spatial': {
+                'origin_x': 48,
+                'origin_y': 8,
+            },
+            'font': weather_animations.CLOUDY_MOON_ANIMATION,
+        },
+    },
+    'rain': {
+        'rain_animation': {
+            # TODO
+            'data_key': 'weather_anim',
+            'spatial': {
+                'origin_x': 48,
+                'origin_y': 8,
+            },
+            'font': weather_animations.RAIN_ANIMATION,
+        },
+    },
+}
+
+PLAIN_CLOCKFACE = {
     'hour_digits': {
-        'data_name': 'hour_digits',
+        'data_key': 'hour_digits',
         'spatial': {
             'origin_x': 1,
             'origin_y': 17,
@@ -23,7 +93,7 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
         },
     },
     'minute_digits': {
-        'data_name': 'minute_digits',
+        'data_key': 'minute_digits',
         'spatial': {
             'origin_x': 18,
             'origin_y': 17,
@@ -32,7 +102,7 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
         'font': numbers_large,
     },
     'second_digits': {
-        'data_name': 'second_digits',
+        'data_key': 'second_digits',
         'spatial': {
             'origin_x': 32,
             'origin_y': 26,
@@ -41,7 +111,7 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
         'font': numbers_tiny,
     },
     'temp_digits': {
-        'data_name': 'temp_digits',
+        'data_key': 'temp_digits',
         'spatial': {
             'origin_x': 52,
             'origin_y': 2,
@@ -56,19 +126,11 @@ LARGE_WITH_TEMPERATURE_CONFIG = {
             'origin_y': 1,
         },
     },
-    'sun': {
-        'data_name': 'sunshine_anim',
-        'spatial': {
-            'origin_x': 48,
-            'origin_y': 8,
-        },
-        'font': glyphs.SHINING_SUN
-    },
 }
 
-TRAFFIC_CONFIG = {
+TRAFFIC_CLOCKFACE = {
     'traffic_delta': {
-        'data_name': 'traffic_delta_digits',
+        'data_key': 'traffic_delta_digits',
         'spatial': {
             'origin_x': 54,
             'origin_y': 25,
@@ -77,7 +139,7 @@ TRAFFIC_CONFIG = {
         'font': numbers_small,
     },
     'travel_time': {
-        'data_name': 'travel_time_digits',
+        'data_key': 'travel_time_digits',
         'spatial': {
             'origin_x': 54,
             'origin_y': 18,
@@ -86,4 +148,4 @@ TRAFFIC_CONFIG = {
         'font': numbers_small,
     },
 }
-TRAFFIC_CONFIG.update(LARGE_WITH_TEMPERATURE_CONFIG)
+TRAFFIC_CLOCKFACE.update(PLAIN_CLOCKFACE)

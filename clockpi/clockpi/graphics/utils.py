@@ -173,11 +173,11 @@ def config_to_matrix(config, data, color):
         if 'item' in group_config:
             group_display = [group_config['item']]
         else:
-            data_name = group_config['data_name']
-            if data_name in data:
-                group_data = data[data_name]
+            data_key = group_config['data_key']
+            if data_key in data:
+                group_data = data[data_key]
             else:
-                raise ValueError("{} not in the data given".format(data_name))
+                raise ValueError("{} not in the data given".format(data_key))
             if 'font_choices' in group_config:
                 font_choices = group_config['font_choices']
                 for font_choice in font_choices:
