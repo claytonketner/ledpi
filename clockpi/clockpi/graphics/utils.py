@@ -185,7 +185,7 @@ def config_to_matrix(config, data, color):
                         group_display = data_to_alphanums(group_data,
                                                           font_choice)
                         break
-                    except NotImplementedError:
+                    except Exception:
                         pass
                 else:
                     raise ValueError("None of the font choices for {} "
