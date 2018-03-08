@@ -20,7 +20,6 @@ WEATHER_ANIMATIONS = {
     },
     'moon': {
         'moon_animation': {
-            # TODO
             'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
@@ -31,7 +30,6 @@ WEATHER_ANIMATIONS = {
     },
     'cloudy': {
         'cloudy_animation': {
-            # TODO
             'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
@@ -42,7 +40,6 @@ WEATHER_ANIMATIONS = {
     },
     'cloudy_sun': {
         'cloudy_sun_animation': {
-            # TODO
             'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
@@ -53,7 +50,6 @@ WEATHER_ANIMATIONS = {
     },
     'cloudy_moon': {
         'cloudy_moon_animation': {
-            # TODO
             'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
@@ -64,7 +60,6 @@ WEATHER_ANIMATIONS = {
     },
     'rain': {
         'rain_animation': {
-            # TODO
             'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
