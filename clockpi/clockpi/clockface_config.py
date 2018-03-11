@@ -12,10 +12,11 @@ WEATHER_ANIMATIONS = {
         'sunshine_animation': {
             'data_key': 'weather_anim',
             'spatial': {
-                'origin_x': 48,
-                'origin_y': 8,
+                'center_x': 19,
+                'center_y': 17,
             },
             'font': weather_animations.SUN_ANIMATION,
+            'color': [244, 188, 66],
         },
     },
     'moon': {
@@ -108,8 +109,8 @@ PLAIN_CLOCKFACE = {
     'temp_digits': {
         'data_key': 'temp_digits',
         'spatial': {
-            'origin_x': 52,
-            'origin_y': 2,
+            'center_x': 19,
+            'center_y': 8,
             'spacing': 1,
         },
         'font_choices': [numbers_tiny, letters_tiny, glyphs],
@@ -117,8 +118,8 @@ PLAIN_CLOCKFACE = {
     'temp_deg_symbol': {
         'item': glyphs.DEGREE,
         'spatial': {
-            'origin_x': 60,
-            'origin_y': 1,
+            'origin_x': 24,
+            'origin_y': 5,
         },
     },
 }

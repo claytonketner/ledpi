@@ -1,8 +1,8 @@
-import math
 from types import ModuleType
 
 from clockpi.constants import ARRAY_HEIGHT
 from clockpi.constants import ARRAY_WIDTH
+from clockpi.graphics.color_utils import set_brightness
 
 
 def generate_empty_matrix(fill_with=[0, 0, 0]):
@@ -15,12 +15,20 @@ def generate_empty_matrix(fill_with=[0, 0, 0]):
     return empty_matrix
 
 
-def add_to_matrix(partial_matrix, matrix, x, y, color=None, transpose=True,
-                  bit_or=True, bit_and=False, bit_xor=False):
+def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
+                  transpose=True, bit_or=True, bit_and=False, bit_xor=False,
+                  mask=False):
     """
     Adds `partial_matrix` to `matrix` at `x`, `y`. If `color` is specified,
     `partial_matrix` will be copied using that color - otherwise, the color
     in `partial_matrix` will just be copied over.
+
+    transpose: transpose the partial_matrix before applying it to the `matrix`
+    bit_or: do a bitwise OR (ish) to determine the final pixel color
+    bit_and: do a bitwise AND to determine the final pixel color
+    bit_xor: do a bitwise XOR to determine the final pixel color
+    mask: turn pixels OFF if they're adjacent to ON pixels (including
+          diagonals)
     """
     if color:
         assert len(color) == 3
@@ -46,6 +54,7 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, transpose=True,
             if type(pm_val) not in (tuple, list):
                 if pm_val:
                     if any(matrix_val):
+                        # TODO is this actually useful?
                         substitute_color = matrix_val
                     else:
                         substitute_color = [255, 255, 255]
@@ -74,47 +83,90 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, transpose=True,
                     final_val = pm_val
                 else:
                     final_val = matrix_val
+            if brightness:
+                final_val = set_brightness(final_val, brightness)
             matrix[x+xx][y+yy] = final_val
+            if mask and any(pm_val):
+                # Kill all adjacent pixels (including diagonals)
+                for ii in xrange(-1, 2):
+                    for jj in xrange(-1, 2):
+                        if ii == 0 and jj == 0:
+                            # Don't check our current/center pixel
+                            continue
+                        matrix_x = x + xx + ii
+                        matrix_y = y + yy + jj
+                        pm_x = xx + ii
+                        pm_y = yy + jj
+                        # Check if we're in bounds
+                        in_matrix = (
+                            matrix_x >= 0 and matrix_y >= 0 and
+                            matrix_x < len(matrix) and
+                            matrix_y < len(matrix[0]))
+                        if not in_matrix:
+                            continue
+                        in_partial_matrix = (
+                            pm_x >= 0 and pm_y >= 0 and
+                            pm_x < partial_matrix_x_len and
+                            pm_y < partial_matrix_y_len)
+                        apply_mask = True
+                        if in_partial_matrix:
+                            # Make sure we don't turn off a pixel that
+                            # came from the source matrix
+                            if transpose:
+                                mask_pm_val = partial_matrix[pm_y][pm_x]
+                            else:
+                                mask_pm_val = partial_matrix[pm_x][pm_y]
+                            if type(mask_pm_val) not in (tuple, list):
+                                apply_mask = not mask_pm_val
+                            else:
+                                apply_mask = not any(mask_pm_val)
+                        if apply_mask:
+                            matrix[matrix_x][matrix_y] = [0, 0, 0]
 
 
-def add_items_to_matrix(items, matrix, origin_x, origin_y, spacing, color,
-                        **kwargs):
+def add_items_to_matrix(items, matrix, origin_x=None, origin_y=None,
+                        center_x=None, center_y=None, spacing=0, **kwargs):
     """Adds a left-aligned 'sentence', which consists of `items`, which are
     separated by `spacing`, which can be an integer, or a list containing
-    spacing distances between each item in `items`
+    spacing distances between each item in `items` (len = n - 1)
+
+    origin_x: top left corner X position (can use center_x instead)
+    origin_y: top left corner Y position (can use center_y instead)
+    center_x: center X position (optional). This will be the centerline of the
+              resulting 'sentence'.
+    center_y: center Y position (optional). This will be the centerline of the
+              resulting 'sentence'.
     """
+    if (origin_x is None and center_x is None) or all([origin_x, center_x]):
+        raise ValueError("Must specify either origin_x or center_x")
+    if (origin_y is None and center_y is None) or all([origin_y, center_y]):
+        raise ValueError("Must specify either origin_y or center_y")
+    if center_x or center_y:
+        total_width = 0
+        total_height = 0
+        for ii in xrange(len(items)):
+            item = items[ii]
+            total_width += len(item[0])
+            total_height = max(total_height, len(item))
+            if ii > 0:
+                space = spacing
+                if hasattr(spacing, '__iter__'):
+                    space = spacing[ii-1]
+                total_width += space
+        if center_x:
+            origin_x = int(center_x - total_width / 2)
+        if center_y:
+            origin_y = int(center_y - total_height / 2)
     x = origin_x
-    for ii in range(len(items)):
+    y = origin_y
+    for ii in xrange(len(items)):
         item = items[ii]
         if ii > 0:
             space = spacing
             if hasattr(spacing, '__iter__'):
                 space = spacing[ii-1]
             x += space + len(items[ii-1][0])
-        add_to_matrix(item, matrix, x, origin_y, color, **kwargs)
-
-
-def calc_color_cos(current_time, start, end, min_val, max_val):
-    """
-    Calculates an upside down cosine that is offset and has some period, but
-    does not repeat. Instead of repeating, it just flatlines.
-    |             ###
-    |            #   #
-    |           #     #
-    |###########       ########
-    -----------------------
-               ^-------^ period
-               ^ start
-                       ^ end
-                   ^ max_val
-     ----------^       ^------ min_val
-    """
-    if current_time <= start or current_time >= end:
-        return min_val
-    period = end - start
-    offset_time = current_time - start
-    return int((math.cos(float(offset_time) / period * 2 * math.pi) * -1 + 1) *
-               (max_val - min_val)/2 + min_val)
+        add_to_matrix(item, matrix, x, y, **kwargs)
 
 
 def data_to_alphanums(data_list, alphanum_source):
@@ -158,7 +210,7 @@ def data_to_alphanums(data_list, alphanum_source):
     return alphanum_list
 
 
-def config_to_matrix(config, data, color):
+def config_to_matrix(config, data, color=None, brightness=None):
     """
     Takes a configuration and data and generates a matrix using the two.
 
@@ -194,6 +246,9 @@ def config_to_matrix(config, data, color):
                 group_display = data_to_alphanums(group_data,
                                                   group_config['font'])
         spatial = group_config['spatial']
-        spatial.setdefault('spacing', 0)
-        add_items_to_matrix(group_display, matrix, color=color, **spatial)
+        if color is None and 'color' in group_config:
+            color = group_config['color']
+        mask = group_config.get('mask', False)
+        add_items_to_matrix(group_display, matrix, color=color,
+                            brightness=brightness, mask=mask, **spatial)
     return matrix

@@ -9,10 +9,15 @@ from clockpi.constants import DAILY_B_MIN
 from clockpi.constants import DAILY_R_MAX
 from clockpi.constants import DAILY_G_MAX
 from clockpi.constants import DAILY_B_MAX
+from clockpi.constants import BRIGHTNESS_START_HOUR
+from clockpi.constants import BRIGHTNESS_END_HOUR
+from clockpi.constants import DAILY_BRIGHTNESS_MIN
+from clockpi.constants import DAILY_BRIGHTNESS_MAX
 from clockpi.constants import SUN_ANIMATION_DURATION
 from clockpi.external import get_traffic
 from clockpi.external import get_weather
-from clockpi.graphics.utils import calc_color_cos
+from clockpi.graphics.color_utils import calc_color_cos
+from clockpi.graphics.color_utils import set_brightness
 from clockpi.secret import DIRECTIONS_END_HOUR
 from clockpi.secret import DIRECTIONS_START_HOUR
 
@@ -36,13 +41,20 @@ def update_time(clock_info, now):
 
 def update_color(clock_info, now):
     day_elapsed_mins = now.hour * 60 + now.minute
-    red = calc_color_cos(day_elapsed_mins, 6*60, 24*60, DAILY_R_MIN,
-                         DAILY_R_MAX)
-    green = calc_color_cos(day_elapsed_mins, 6*60, 24*60, DAILY_G_MIN,
-                           DAILY_G_MAX)
-    blue = calc_color_cos(day_elapsed_mins, 6*60, 24*60, DAILY_B_MIN,
-                          DAILY_B_MAX)
-    clock_info['color'] = (red, green, blue)
+    clock_info['brightness'] = calc_color_cos(
+        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
+        DAILY_BRIGHTNESS_MIN, DAILY_BRIGHTNESS_MAX)
+    red = calc_color_cos(
+        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
+        DAILY_R_MIN, DAILY_R_MAX)
+    green = calc_color_cos(
+        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
+        DAILY_G_MIN, DAILY_G_MAX)
+    blue = calc_color_cos(
+        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
+        DAILY_B_MIN, DAILY_B_MAX)
+    clock_info['color'] = set_brightness([red, green, blue],
+                                         clock_info['brightness'])
 
 
 def update_weather(clock_info, now):
@@ -72,6 +84,7 @@ def update_weather(clock_info, now):
         clock_info['show_sunset'] = (sunset_anim_pct > 0 and
                                      sunset_anim_pct < 1)
         weather_forecast = clock_info['weather']['forecast']
+        weather_forecast = 'clear'
         if clock_info['sun_is_up']:
             # Day
             if weather_forecast == 'clear':
