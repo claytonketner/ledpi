@@ -84,7 +84,6 @@ def update_weather(clock_info, now):
         clock_info['show_sunset'] = (sunset_anim_pct > 0 and
                                      sunset_anim_pct < 1)
         weather_forecast = clock_info['weather']['forecast']
-        weather_forecast = 'clear'
         if clock_info['sun_is_up']:
             # Day
             if weather_forecast == 'clear':

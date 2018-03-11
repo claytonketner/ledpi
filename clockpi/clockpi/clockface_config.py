@@ -13,7 +13,7 @@ WEATHER_ANIMATIONS = {
             'data_key': 'weather_anim',
             'spatial': {
                 'center_x': 19,
-                'center_y': 17,
+                'center_y': 14,
             },
             'font': weather_animations.SUN_ANIMATION,
             'color': [244, 188, 66],

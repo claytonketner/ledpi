@@ -17,7 +17,7 @@ def generate_empty_matrix(fill_with=[0, 0, 0]):
 
 def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                   transpose=True, bit_or=True, bit_and=False, bit_xor=False,
-                  mask=False):
+                  mask=False, mask_amount=0.5):
     """
     Adds `partial_matrix` to `matrix` at `x`, `y`. If `color` is specified,
     `partial_matrix` will be copied using that color - otherwise, the color
@@ -27,8 +27,8 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
     bit_or: do a bitwise OR (ish) to determine the final pixel color
     bit_and: do a bitwise AND to determine the final pixel color
     bit_xor: do a bitwise XOR to determine the final pixel color
-    mask: turn pixels OFF if they're adjacent to ON pixels (including
-          diagonals)
+    mask: dim pixels if they're adjacent to ON pixels (including diagonals)
+    mask_amount: amount to dim pixels as a percentage for the mask
     """
     if color:
         assert len(color) == 3
@@ -87,7 +87,7 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                 final_val = set_brightness(final_val, brightness)
             matrix[x+xx][y+yy] = final_val
             if mask and any(pm_val):
-                # Kill all adjacent pixels (including diagonals)
+                # Knock back all adjacent pixels (including diagonals)
                 for ii in xrange(-1, 2):
                     for jj in xrange(-1, 2):
                         if ii == 0 and jj == 0:
@@ -110,7 +110,7 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                             pm_y < partial_matrix_y_len)
                         apply_mask = True
                         if in_partial_matrix:
-                            # Make sure we don't turn off a pixel that
+                            # Make sure we don't knock back a pixel that
                             # came from the source matrix
                             if transpose:
                                 mask_pm_val = partial_matrix[pm_y][pm_x]
@@ -121,7 +121,9 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                             else:
                                 apply_mask = not any(mask_pm_val)
                         if apply_mask:
-                            matrix[matrix_x][matrix_y] = [0, 0, 0]
+                            matrix[matrix_x][matrix_y] = set_brightness(
+                                matrix[matrix_x][matrix_y], mask_amount,
+                                as_percentage=True)
 
 
 def add_items_to_matrix(items, matrix, origin_x=None, origin_y=None,

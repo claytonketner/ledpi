@@ -1,16 +1,20 @@
 import math
 
 
-def set_brightness(color, brightness):
+def set_brightness(color, brightness, as_percentage=False):
     """
-    Scales a color to a new brightness (0 to 255)
+    Scales a color to a new brightness (0 to 255) or scales it by `brightness`
+    as a percentage (where `brightness` is 0-1). Return colors are 0-255.
     """
-    if brightness < 0 or brightness > 255:
+    if not as_percentage and (brightness < 0 or brightness > 255):
         raise ValueError('Brightness {} is invalid.'.format(brightness))
     average = float(sum(color))/len(color)
     if average == 0:
         return [0, 0, 0]
-    return map(int, [c / average * brightness for c in color])
+    if as_percentage:
+        average = 1
+    return map(int, [max(0, min(255, c / average * brightness))
+                     for c in color])
 
 
 def calc_color_cos(current_time, start, end, min_val, max_val):
