@@ -1,8 +1,5 @@
-import time
-
 from datetime import datetime
 
-from clockpi.alphanum import weather_animations
 from clockpi.constants import DAILY_R_MIN
 from clockpi.constants import DAILY_G_MIN
 from clockpi.constants import DAILY_B_MIN
@@ -88,48 +85,22 @@ def update_weather(clock_info, now):
             # Day
             if weather_forecast == 'clear':
                 clock_info['forecast_key'] = 'sunny'
-                clock_info['weather_anim'] = (
-                    int(time.time()) % len(weather_animations.SUN_ANIMATION))
             elif weather_forecast == 'partlycloudy':
-                # TODO
                 clock_info['forecast_key'] = 'cloudy_sun'
-                clock_info['weather_anim'] = (
-                    int(time.time()) %
-                    len(weather_animations.CLOUDY_SUN_ANIMATION))
             elif weather_forecast == 'cloudy':
-                # TODO
                 clock_info['forecast_key'] = 'cloudy'
-                clock_info['weather_anim'] = (
-                    int(time.time()) %
-                    len(weather_animations.CLOUDY_ANIMATION))
             elif weather_forecast == 'rain':
-                # TODO
                 clock_info['forecast_key'] = 'rain'
-                clock_info['weather_anim'] = (
-                    int(time.time()) % len(weather_animations.RAIN_ANIMATION))
         else:
             # Night
             if weather_forecast == 'clear':
                 clock_info['forecast_key'] = 'moon'
-                clock_info['weather_anim'] = (
-                    int(time.time()) % len(weather_animations.MOON_ANIMATION))
             elif weather_forecast == 'partlycloudy':
-                # TODO
                 clock_info['forecast_key'] = 'cloudy_moon'
-                clock_info['weather_anim'] = (
-                    int(time.time()) %
-                    len(weather_animations.CLOUDY_MOON_ANIMATION))
             elif weather_forecast == 'cloudy':
-                # TODO
                 clock_info['forecast_key'] = 'cloudy'
-                clock_info['weather_anim'] = (
-                    int(time.time()) %
-                    len(weather_animations.CLOUDY_ANIMATION))
             elif weather_forecast == 'rain':
-                # TODO
                 clock_info['forecast_key'] = 'rain'
-                clock_info['weather_anim'] = (
-                    int(time.time()) % len(weather_animations.RAIN_ANIMATION))
     else:
         clock_info['temp_digits'] = ['E', 'R']
         # Default to sundown because the bright clockface is annoying at night

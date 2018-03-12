@@ -21,8 +21,11 @@ def display_clock(clock_info={}, update_freq=0.2):
     forecast_key = clock_info.get('forecast_key')
     if forecast_key:
         weather_config = WEATHER_ANIMATIONS[forecast_key]
+        for conf in weather_config.itervalues():
+            conf.setdefault('color', clock_info['color'])
         weather_matrix = config_to_matrix(weather_config, clock_info,
-                                          brightness=clock_info['brightness'])
+                                          brightness=clock_info['brightness'],
+                                          bit_or=False)
         add_to_matrix(weather_matrix, matrix, 0, 0, transpose=False)
     if clock_info['show_traffic']:
         clockface = config_to_matrix(TRAFFIC_CLOCKFACE, clock_info,

@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from clockpi.alphanum import glyphs
 from clockpi.alphanum import letters_tiny
 from clockpi.alphanum import numbers_large
@@ -6,11 +8,31 @@ from clockpi.alphanum import numbers_tiny
 from clockpi.alphanum import weather_animations
 
 
+"""
+Clockface configuration information. A certain configuration consists of dict
+of inner dicts that describe what should be displayed and where, along with
+some other details. The outermost keys are just names and are not actually
+used. Not all of the following keys are required.
+
+- item: the item to be displayed. Useful for if you just want to show a static
+    image and there is nothing to be looked up
+- data_key: is the key to the `clock_info` dict whose value contains the data
+    used to look up what should be displayed within the given `font`
+- spatial: information on where/how the item should be drawn
+- font: an iterable or module that contains the thing(s) to be drawn on screen
+    which are looked up using `data_key`
+- font_choices: an iterable of `font`s that get tried in order to be used, for
+    example, if a number display should also sometimes be able to show letters
+- color: a custom RGB color (0-255)
+
+Put the word 'animation' in the key for that item to be handled as an
+animation, which means you don't need to include a `data_key`.
+"""
+
 # The keys of this dict correspond to the possible weather forecasts
 WEATHER_ANIMATIONS = {
     'sunny': {
         'sunshine_animation': {
-            'data_key': 'weather_anim',
             'spatial': {
                 'center_x': 19,
                 'center_y': 14,
@@ -21,7 +43,6 @@ WEATHER_ANIMATIONS = {
     },
     'moon': {
         'moon_animation': {
-            'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
                 'origin_y': 8,
@@ -31,7 +52,6 @@ WEATHER_ANIMATIONS = {
     },
     'cloudy': {
         'cloudy_animation': {
-            'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
                 'origin_y': 8,
@@ -39,29 +59,65 @@ WEATHER_ANIMATIONS = {
             'font': weather_animations.CLOUDY_ANIMATION,
         },
     },
-    'cloudy_sun': {
-        'cloudy_sun_animation': {
-            'data_key': 'weather_anim',
+    'cloudy_sun': OrderedDict((
+        ('sun_animation', {
             'spatial': {
-                'origin_x': 48,
-                'origin_y': 8,
+                'center_x': 19,
+                'center_y': 14,
             },
-            'font': weather_animations.CLOUDY_SUN_ANIMATION,
-        },
-    },
-    'cloudy_moon': {
-        'cloudy_moon_animation': {
-            'data_key': 'weather_anim',
+            'font': weather_animations.SUN_ANIMATION,
+            'color': [244, 188, 66],
+         }),
+        ('cloudy_animation', {
             'spatial': {
-                'origin_x': 48,
-                'origin_y': 8,
+                'center_x': 14,
+                'center_y': 14,
             },
-            'font': weather_animations.CLOUDY_MOON_ANIMATION,
-        },
-    },
+            'font': weather_animations.CLOUDY_ANIMATION,
+            'color': [214, 242, 255],
+            'mask': True,
+         }),
+        ('cloudy_animation_2', {
+            'spatial': {
+                'center_x': 24,
+                'center_y': 12,
+            },
+            'font': weather_animations.CLOUDY_ANIMATION,
+            'color': [214, 242, 255],
+            'mask': True,
+         }),
+    )),
+    'cloudy_moon': OrderedDict((
+        ('cloudy_animation', {
+            'spatial': {
+                'center_x': 14,
+                'center_y': 10,
+            },
+            'font': weather_animations.CLOUDY_ANIMATION,
+            'color': [214, 242, 255],
+            'mask': True,
+         }),
+        ('cloudy_animation_2', {
+            'spatial': {
+                'center_x': 24,
+                'center_y': 12,
+            },
+            'font': weather_animations.CLOUDY_ANIMATION,
+            'color': [214, 242, 255],
+            'mask': True,
+         }),
+        ('moon_animation', {
+            'spatial': {
+                'center_x': 19,
+                'center_y': 8,
+            },
+            'font': weather_animations.MOON_ANIMATION,
+            'color': [244, 188, 66],
+            'mask': True,
+         }),
+    )),
     'rain': {
         'rain_animation': {
-            'data_key': 'weather_anim',
             'spatial': {
                 'origin_x': 48,
                 'origin_y': 8,

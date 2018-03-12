@@ -1,3 +1,4 @@
+import time
 from types import ModuleType
 
 from clockpi.constants import ARRAY_HEIGHT
@@ -212,7 +213,7 @@ def data_to_alphanums(data_list, alphanum_source):
     return alphanum_list
 
 
-def config_to_matrix(config, data, color=None, brightness=None):
+def config_to_matrix(config, data, color=None, brightness=None, **kwargs):
     """
     Takes a configuration and data and generates a matrix using the two.
 
@@ -227,16 +228,20 @@ def config_to_matrix(config, data, color=None, brightness=None):
         if 'item' in group_config:
             group_display = [group_config['item']]
         else:
-            data_key = group_config['data_key']
-            if data_key in data:
-                group_data = data[data_key]
+            if 'animation' in group_name:
+                lookup_data = (int(time.time()) % len(group_config['font']))
             else:
-                raise ValueError("{} not in the data given".format(data_key))
+                data_key = group_config['data_key']
+                if data_key in data:
+                    lookup_data = data[data_key]
+                else:
+                    raise ValueError("{} is not in the data given".format(
+                                     data_key))
             if 'font_choices' in group_config:
                 font_choices = group_config['font_choices']
                 for font_choice in font_choices:
                     try:
-                        group_display = data_to_alphanums(group_data,
+                        group_display = data_to_alphanums(lookup_data,
                                                           font_choice)
                         break
                     except Exception:
@@ -245,12 +250,14 @@ def config_to_matrix(config, data, color=None, brightness=None):
                     raise ValueError("None of the font choices for {} "
                                      "worked.".format(group_name))
             else:
-                group_display = data_to_alphanums(group_data,
+                group_display = data_to_alphanums(lookup_data,
                                                   group_config['font'])
         spatial = group_config['spatial']
-        if color is None and 'color' in group_config:
-            color = group_config['color']
+        this_color = color or group_config['color']
         mask = group_config.get('mask', False)
-        add_items_to_matrix(group_display, matrix, color=color,
-                            brightness=brightness, mask=mask, **spatial)
+        this_kwargs = {}
+        this_kwargs.update(kwargs)
+        this_kwargs.update(spatial)
+        add_items_to_matrix(group_display, matrix, color=this_color,
+                            brightness=brightness, mask=mask, **this_kwargs)
     return matrix

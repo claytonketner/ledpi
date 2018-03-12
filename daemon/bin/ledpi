@@ -5,5 +5,11 @@ touch $logfile
 cd /home/clayton/ledpi/clockpi
 source venv/bin/activate
 export PYTHONPATH=$PYTHONPATH:$PWD/clockpi
-echo "Starting main..." >> $logfile
-python clockpi/main.py >>$logfile 2>&1
+if [[ $@ = *"--nologfile"* ]]; then
+	echo "Starting ledpi without log file"
+	python clockpi/main.py
+else
+	echo "Starting ledpi with log file $logfile"
+	echo "Starting main..." >> $logfile
+	python clockpi/main.py >>$logfile 2>&1
+fi
