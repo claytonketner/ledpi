@@ -88,30 +88,21 @@ WEATHER_ANIMATIONS = {
          }),
     )),
     'cloudy_moon': OrderedDict((
-        ('cloudy_animation', {
-            'spatial': {
-                'center_x': 14,
-                'center_y': 10,
-            },
-            'font': weather_animations.CLOUDY_ANIMATION,
-            'color': [214, 242, 255],
-            'mask': True,
-         }),
-        ('cloudy_animation_2', {
-            'spatial': {
-                'center_x': 24,
-                'center_y': 12,
-            },
-            'font': weather_animations.CLOUDY_ANIMATION,
-            'color': [214, 242, 255],
-            'mask': True,
-         }),
-        ('moon_animation', {
+        ('cloud_1', {
             'spatial': {
                 'center_x': 19,
                 'center_y': 8,
             },
-            'font': weather_animations.MOON_ANIMATION,
+            'item': weather_animations.CLOUD_LONG,
+            'color': [214, 242, 255],
+            'mask': True,
+         }),
+        ('moon', {
+            'spatial': {
+                'center_x': 19,
+                'center_y': 9,
+            },
+            'item': weather_animations.MOON_LARGE,
             'color': [244, 188, 66],
             'mask': True,
          }),

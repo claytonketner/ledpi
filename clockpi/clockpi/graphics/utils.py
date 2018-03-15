@@ -18,7 +18,7 @@ def generate_empty_matrix(fill_with=[0, 0, 0]):
 
 def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                   transpose=True, bit_or=True, bit_and=False, bit_xor=False,
-                  mask=False, mask_amount=0.5):
+                  mask=False, mask_amount=0.35):
     """
     Adds `partial_matrix` to `matrix` at `x`, `y`. If `color` is specified,
     `partial_matrix` will be copied using that color - otherwise, the color
@@ -122,6 +122,7 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                             else:
                                 apply_mask = not any(mask_pm_val)
                         if apply_mask:
+                            # FIXME: only lower the brightness once
                             matrix[matrix_x][matrix_y] = set_brightness(
                                 matrix[matrix_x][matrix_y], mask_amount,
                                 as_percentage=True)
