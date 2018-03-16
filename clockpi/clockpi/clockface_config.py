@@ -42,21 +42,21 @@ WEATHER_ANIMATIONS = {
         },
     },
     'moon': {
-        'moon_animation': {
+        'moon': {
             'spatial': {
-                'origin_x': 48,
-                'origin_y': 8,
+                'center_x': 19,
+                'center_y': 9,
             },
-            'font': weather_animations.MOON_ANIMATION,
+            'item': weather_animations.MOON_LARGE,
         },
     },
     'cloudy': {
-        'cloudy_animation': {
+        'cloud': {
             'spatial': {
-                'origin_x': 48,
-                'origin_y': 8,
+                'center_x': 18,
+                'center_y': 8,
             },
-            'font': weather_animations.CLOUDY_ANIMATION,
+            'item': weather_animations.CLOUD_LONG,
         },
     },
     'cloudy_sun': OrderedDict((
@@ -74,7 +74,7 @@ WEATHER_ANIMATIONS = {
                 'center_y': 14,
             },
             'font': weather_animations.CLOUDY_ANIMATION,
-            'color': [214, 242, 255],
+            'color': [255, 255, 255],
             'mask': True,
          }),
         ('cloudy_animation_2', {
@@ -83,7 +83,7 @@ WEATHER_ANIMATIONS = {
                 'center_y': 12,
             },
             'font': weather_animations.CLOUDY_ANIMATION,
-            'color': [214, 242, 255],
+            'color': [255, 255, 255],
             'mask': True,
          }),
     )),
@@ -94,7 +94,7 @@ WEATHER_ANIMATIONS = {
                 'center_y': 8,
             },
             'item': weather_animations.CLOUD_LONG,
-            'color': [214, 242, 255],
+            'color': [255, 255, 255],
             'mask': True,
          }),
         ('moon', {
@@ -107,15 +107,25 @@ WEATHER_ANIMATIONS = {
             'mask': True,
          }),
     )),
-    'rain': {
-        'rain_animation': {
+    'rain': OrderedDict((
+        ('rain_animation', {
             'spatial': {
-                'origin_x': 48,
-                'origin_y': 8,
+                'center_x': 18,
+                'center_y': 14,
             },
             'font': weather_animations.RAIN_ANIMATION,
-        },
-    },
+            'color': [201, 234, 255],
+        }),
+        ('cloud_1', {
+            'spatial': {
+                'center_x': 18,
+                'center_y': 8,
+            },
+            'item': weather_animations.CLOUD_LONG,
+            'color': [255, 255, 255],
+            'mask': True,
+         }),
+    )),
 }
 
 PLAIN_CLOCKFACE = {
