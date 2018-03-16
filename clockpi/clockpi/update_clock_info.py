@@ -1,15 +1,17 @@
 from datetime import datetime
 
+from clockpi.constants import BLOOM_START_HOUR_OFFSET
+from clockpi.constants import BLOOM_END_HOUR_OFFSET
 from clockpi.constants import DAILY_R_MIN
 from clockpi.constants import DAILY_G_MIN
 from clockpi.constants import DAILY_B_MIN
 from clockpi.constants import DAILY_R_MAX
 from clockpi.constants import DAILY_G_MAX
 from clockpi.constants import DAILY_B_MAX
-from clockpi.constants import BRIGHTNESS_START_HOUR
-from clockpi.constants import BRIGHTNESS_END_HOUR
 from clockpi.constants import DAILY_BRIGHTNESS_MIN
 from clockpi.constants import DAILY_BRIGHTNESS_MAX
+from clockpi.constants import DEFAULT_SUNRISE_HOUR
+from clockpi.constants import DEFAULT_SUNSET_HOUR
 from clockpi.constants import SUN_ANIMATION_DURATION
 from clockpi.external import get_traffic
 from clockpi.external import get_weather
@@ -34,24 +36,6 @@ def update_time(clock_info, now):
     clock_info['second'] = second
     if hour_12 < 10:
         clock_info['hour_digits'][0] = 'BLANK'
-
-
-def update_color(clock_info, now):
-    day_elapsed_mins = now.hour * 60 + now.minute
-    clock_info['brightness'] = calc_color_cos(
-        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
-        DAILY_BRIGHTNESS_MIN, DAILY_BRIGHTNESS_MAX)
-    red = calc_color_cos(
-        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
-        DAILY_R_MIN, DAILY_R_MAX)
-    green = calc_color_cos(
-        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
-        DAILY_G_MIN, DAILY_G_MAX)
-    blue = calc_color_cos(
-        day_elapsed_mins, BRIGHTNESS_START_HOUR*60, BRIGHTNESS_END_HOUR*60,
-        DAILY_B_MIN, DAILY_B_MAX)
-    clock_info['color'] = set_brightness([red, green, blue],
-                                         clock_info['brightness'])
 
 
 def update_weather(clock_info, now):
@@ -109,6 +93,30 @@ def update_weather(clock_info, now):
         clock_info['show_sunset'] = False
 
 
+def update_color(clock_info, now):
+    # Depends on update_weather
+    day_elapsed_mins = now.hour * 60 + now.minute
+    sunrise_hour = DEFAULT_SUNRISE_HOUR
+    sunset_hour = DEFAULT_SUNSET_HOUR
+    if clock_info.get('weather', {}).get('sunrise'):
+        sunrise_hour = clock_info['weather']['sunrise'].hour
+    if clock_info.get('weather', {}).get('sunset'):
+        sunset_hour = clock_info['weather']['sunset'].hour
+    bloom_start = (sunrise_hour + BLOOM_START_HOUR_OFFSET) * 60
+    bloom_end = (sunset_hour + BLOOM_END_HOUR_OFFSET) * 60
+    clock_info['brightness'] = calc_color_cos(
+        day_elapsed_mins, bloom_start, bloom_end, DAILY_BRIGHTNESS_MIN,
+        DAILY_BRIGHTNESS_MAX)
+    red = calc_color_cos(
+        day_elapsed_mins, bloom_start, bloom_end, DAILY_R_MIN, DAILY_R_MAX)
+    green = calc_color_cos(
+        day_elapsed_mins, bloom_start, bloom_end, DAILY_G_MIN, DAILY_G_MAX)
+    blue = calc_color_cos(
+        day_elapsed_mins, bloom_start, bloom_end, DAILY_B_MIN, DAILY_B_MAX)
+    clock_info['color'] = set_brightness([red, green, blue],
+                                         clock_info['brightness'])
+
+
 def update_traffic(clock_info, now):
     # Only show traffic around the times I may be going to work
     clock_info['show_traffic'] = (now.hour >= DIRECTIONS_START_HOUR and
@@ -138,7 +146,7 @@ def update_clock_info(clock_info, update_freq):
             return False
     clock_info['last_update_time'] = now
     update_time(clock_info, now)
-    update_color(clock_info, now)
     update_weather(clock_info, now)
+    update_color(clock_info, now)
     update_traffic(clock_info, now)
     return True

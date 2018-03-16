@@ -117,10 +117,10 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                                 mask_pm_val = partial_matrix[pm_y][pm_x]
                             else:
                                 mask_pm_val = partial_matrix[pm_x][pm_y]
-                            if type(mask_pm_val) not in (tuple, list):
-                                apply_mask = not mask_pm_val
-                            else:
+                            if type(mask_pm_val) in (tuple, list):
                                 apply_mask = not any(mask_pm_val)
+                            else:
+                                apply_mask = not mask_pm_val
                         if apply_mask:
                             # FIXME: only lower the brightness once
                             matrix[matrix_x][matrix_y] = set_brightness(
