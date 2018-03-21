@@ -6,6 +6,7 @@ from clockpi.alphanum import numbers_large
 from clockpi.alphanum import numbers_small
 from clockpi.alphanum import numbers_tiny
 from clockpi.alphanum import weather_animations
+from clockpi.procedural_animations import ProceduralRain
 
 
 """
@@ -110,11 +111,11 @@ WEATHER_ANIMATIONS = {
     'rain': OrderedDict((
         ('rain_animation', {
             'spatial': {
-                'center_x': 18,
-                'center_y': 14,
+                'origin_x': 1,
+                'origin_y': 8,
             },
-            'font': weather_animations.RAIN_ANIMATION,
-            'color': [201, 234, 255],
+            'procedural_animation': ProceduralRain(18, 38),
+            'color': [30, 172, 255],
         }),
         ('cloud_1', {
             'spatial': {

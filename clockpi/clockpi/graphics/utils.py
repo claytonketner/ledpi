@@ -226,8 +226,17 @@ def config_to_matrix(config, data, color=None, brightness=None, **kwargs):
     """
     matrix = generate_empty_matrix()
     for group_name, group_config in config.iteritems():
+        spatial = group_config['spatial']
+        this_color = color or group_config['color']
+        mask = group_config.get('mask', False)
+        this_kwargs = {}
+        this_kwargs.update(kwargs)
+        this_kwargs.update(spatial)
         if 'item' in group_config:
-            group_display = [group_config['item']]
+            group_display = [group_config['item'], ]
+        elif 'procedural_animation' in group_config:
+            anim_obj = group_config['procedural_animation']
+            group_display = [anim_obj.get_next_frame(), ]
         else:
             if 'animation' in group_name:
                 lookup_data = (int(time.time()) % len(group_config['font']))
@@ -253,12 +262,6 @@ def config_to_matrix(config, data, color=None, brightness=None, **kwargs):
             else:
                 group_display = data_to_alphanums(lookup_data,
                                                   group_config['font'])
-        spatial = group_config['spatial']
-        this_color = color or group_config['color']
-        mask = group_config.get('mask', False)
-        this_kwargs = {}
-        this_kwargs.update(kwargs)
-        this_kwargs.update(spatial)
         add_items_to_matrix(group_display, matrix, color=this_color,
                             brightness=brightness, mask=mask, **this_kwargs)
     return matrix
