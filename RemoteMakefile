@@ -8,7 +8,7 @@ PY_REQS=$(CLOCKPI_DIR)/requirements.txt
 DAEMON_DIR=$(DIR)/daemon
 
 .PHONY: all
-all: $(VIRTUAL_ENV) $(VENV_ACTIVATE) rgbmatrix
+all: $(VIRTUAL_ENV) $(VENV_ACTIVATE)
 
 $(VIRTUAL_ENV):
 	virtualenv $(VIRTUAL_ENV)

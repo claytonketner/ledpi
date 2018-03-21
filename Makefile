@@ -17,6 +17,10 @@ remote: push
 try: push
 	ssh -t $(TARGET) 'cd $(DIR) && make -f RemoteMakefile $@'
 
+.PHONY: rgbmatrix
+rgbmatrix:
+	ssh -t $(TARGET) 'cd $(DIR) && make -f RemoteMakefile $@'
+
 .PHONY: daemon
 daemon: push
 	ssh -t $(TARGET) 'cd $(DIR) && make -f RemoteMakefile $@'
