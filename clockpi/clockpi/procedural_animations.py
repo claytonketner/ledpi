@@ -35,13 +35,13 @@ class ProceduralRain(ProceduralAnimation):
     Uses the frame like a queue, adding to the front and popping off the back
     since the rain is just falling down.
     """
-    DROPLET_DENSITY = 0.15  # Average number of droplets per pixel
+    DROPLET_DENSITY = 0.12  # Average number of droplets per pixel
     DROPLET_LENGTH = 2  # Vertical length of droplets
 
-    def __init__(self, animation_height, animation_width):
+    def __init__(self, animation_width, animation_height):
         super(ProceduralRain, self).__init__()
-        self.animation_height = animation_height
         self.animation_width = animation_width
+        self.animation_height = animation_height
         self.current_frame = []
         # Generate a blank frame
         for _ in xrange(self.animation_height):
