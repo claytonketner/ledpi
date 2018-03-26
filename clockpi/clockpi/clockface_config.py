@@ -49,6 +49,8 @@ WEATHER_ANIMATIONS = {
                 'center_y': 9,
             },
             'item': weather_animations.MOON_LARGE,
+            'color': [244, 188, 66],
+            'mask': True,
         },
     },
     'cloudy': {
@@ -58,6 +60,8 @@ WEATHER_ANIMATIONS = {
                 'center_y': 8,
             },
             'item': weather_animations.CLOUD_LONG,
+            'color': [255, 255, 255],
+            'mask': True,
         },
     },
     'cloudy_sun': OrderedDict((
