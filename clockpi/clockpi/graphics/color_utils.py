@@ -12,7 +12,7 @@ def set_brightness(color, brightness, as_percentage=False):
     if average == 0:
         return [0, 0, 0]
     if as_percentage:
-        average = 1
+        average = 1.0
     return map(int, [max(0, min(255, c / average * brightness))
                      for c in color])
 
