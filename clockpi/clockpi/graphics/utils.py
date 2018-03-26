@@ -6,19 +6,20 @@ from clockpi.constants import ARRAY_WIDTH
 from clockpi.graphics.color_utils import set_brightness
 
 
-def generate_empty_matrix(fill_with=[0, 0, 0]):
+def generate_empty_matrix(fill_with=[0, 0, 0], width=ARRAY_WIDTH,
+                          height=ARRAY_HEIGHT):
     """Generates a matrix of zeros that can be referenced like:
         my_matrix[x_coordinate][y_coordinate]
     """
     empty_matrix = []
-    for _ in xrange(ARRAY_WIDTH):
-        empty_matrix.append([fill_with] * ARRAY_HEIGHT)
+    for _ in xrange(width):
+        empty_matrix.append([fill_with] * height)
     return empty_matrix
 
 
 def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                   transpose=True, bit_or=True, bit_and=False, bit_xor=False,
-                  mask=False, mask_amount=0.35):
+                  mask=False, mask_amount=0.5):
     """
     Adds `partial_matrix` to `matrix` at `x`, `y`. If `color` is specified,
     `partial_matrix` will be copied using that color - otherwise, the color
@@ -31,6 +32,7 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
     mask: dim pixels if they're adjacent to ON pixels (including diagonals)
     mask_amount: amount to dim pixels as a percentage for the mask
     """
+    mask_blacklist = generate_empty_matrix(False, len(matrix), len(matrix[0]))
     if color:
         assert len(color) == 3
     if transpose:
@@ -54,15 +56,15 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
             # in `color` or the matrix color
             if type(pm_val) not in (tuple, list):
                 if pm_val:
-                    if any(matrix_val):
-                        # TODO is this actually useful?
-                        substitute_color = matrix_val
-                    else:
-                        substitute_color = [255, 255, 255]
-                    pm_val = color or substitute_color
+                    pm_val = color or [255, 255, 255]
                 else:
-                    # pm_val is 0
-                    pm_val = [0, 0, 0]
+                    # pm_val is an off pixel, can be skipped
+                    continue
+            else:
+                # pm_val is a color
+                if not any(pm_val):
+                    # pm_val is an off pixel, can be skipped
+                    continue
             if bit_and:
                 if any(matrix_val) and any(pm_val):
                     # Take the average
@@ -87,7 +89,8 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
             if brightness:
                 final_val = set_brightness(final_val, brightness)
             matrix[x+xx][y+yy] = final_val
-            if mask and any(pm_val):
+            mask_blacklist[x+xx][y+yy] = True
+            if mask:
                 # Knock back all adjacent pixels (including diagonals)
                 for ii in xrange(-1, 2):
                     for jj in xrange(-1, 2):
@@ -96,8 +99,6 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                             continue
                         matrix_x = x + xx + ii
                         matrix_y = y + yy + jj
-                        pm_x = xx + ii
-                        pm_y = yy + jj
                         # Check if we're in bounds
                         in_matrix = (
                             matrix_x >= 0 and matrix_y >= 0 and
@@ -105,27 +106,15 @@ def add_to_matrix(partial_matrix, matrix, x, y, color=None, brightness=None,
                             matrix_y < len(matrix[0]))
                         if not in_matrix:
                             continue
-                        in_partial_matrix = (
-                            pm_x >= 0 and pm_y >= 0 and
-                            pm_x < partial_matrix_x_len and
-                            pm_y < partial_matrix_y_len)
-                        apply_mask = True
-                        if in_partial_matrix:
-                            # Make sure we don't knock back a pixel that
-                            # came from the source matrix
-                            if transpose:
-                                mask_pm_val = partial_matrix[pm_y][pm_x]
-                            else:
-                                mask_pm_val = partial_matrix[pm_x][pm_y]
-                            if type(mask_pm_val) in (tuple, list):
-                                apply_mask = not any(mask_pm_val)
-                            else:
-                                apply_mask = not mask_pm_val
-                        if apply_mask:
-                            # FIXME: only lower the brightness once
-                            matrix[matrix_x][matrix_y] = set_brightness(
+                        if not mask_blacklist[matrix_x][matrix_y]:
+                            mask_blacklist[matrix_x][matrix_y] = True
+                            old_pixel = matrix[matrix_x][matrix_y]
+                            if not any(old_pixel):
+                                continue
+                            new_pixel = set_brightness(
                                 matrix[matrix_x][matrix_y], mask_amount,
                                 as_percentage=True)
+                            matrix[matrix_x][matrix_y] = new_pixel
 
 
 def add_items_to_matrix(items, matrix, origin_x=None, origin_y=None,
