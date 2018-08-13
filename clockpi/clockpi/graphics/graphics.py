@@ -7,32 +7,34 @@ from clockpi.graphics.utils import generate_empty_matrix
 from clockpi.update_clock_info import update_clock_info
 
 
-def display_clock(clock_info={}, update_freq=0.2):
-    """
-    N.B.: Uses the fact that the default arg for clock_info can be mutated
-    permanently because it's a dictionary. Kinda sketchy...?
+class LEDPi(object):
+    def __init__(self, update_freq=0.0):
+        self.update_freq = update_freq
+        self.data = {}
 
-    Returns the matrix to be displayed, or None, if the display shouldn't be
-    updated.
-    """
-    if not update_clock_info(clock_info, update_freq):
-        return None
-    matrix = generate_empty_matrix()
-    forecast_key = clock_info.get('forecast_key')
-    if forecast_key:
-        weather_config = WEATHER_ANIMATIONS[forecast_key]
-        for conf in weather_config.itervalues():
-            conf.setdefault('color', clock_info['color'])
-        weather_matrix = config_to_matrix(weather_config, clock_info,
-                                          brightness=clock_info['brightness'],
-                                          bit_or=False)
-        add_to_matrix(weather_matrix, matrix, 0, 0, transpose=False)
-    if clock_info['show_traffic']:
-        clockface = config_to_matrix(TRAFFIC_CLOCKFACE, clock_info,
-                                     color=clock_info['color'])
-    else:
-        clockface = config_to_matrix(PLAIN_CLOCKFACE, clock_info,
-                                     color=clock_info['color'])
-    add_to_matrix(clockface, matrix, 0, 0, transpose=False, bit_or=False,
-                  mask=True)
-    return matrix
+    def display_clock(self):
+        """
+        Returns the current matrix to be displayed, or None, if the display
+        shouldn't be updated right now.
+        """
+        if not update_clock_info(self.data, self.update_freq):
+            return None
+        matrix = generate_empty_matrix()
+        forecast_key = self.data.get('forecast_key')
+        if forecast_key:
+            weather_config = WEATHER_ANIMATIONS[forecast_key]
+            for conf in weather_config.itervalues():
+                conf.setdefault('color', self.data['color'])
+            weather_matrix = config_to_matrix(
+                weather_config, self.data,
+                brightness=self.data['brightness'], bit_or=False)
+            add_to_matrix(weather_matrix, matrix, 0, 0, transpose=False)
+        if self.data['show_traffic']:
+            clockface = config_to_matrix(TRAFFIC_CLOCKFACE, self.data,
+                                         color=self.data['color'])
+        else:
+            clockface = config_to_matrix(PLAIN_CLOCKFACE, self.data,
+                                         color=self.data['color'])
+        add_to_matrix(clockface, matrix, 0, 0, transpose=False,
+                      bit_or=False, mask=True)
+        return matrix

@@ -4,15 +4,16 @@ import argparse
 import time
 
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
-from clockpi.graphics.graphics import display_clock
+from clockpi.graphics.graphics import LEDPi
 from clockpi.utils import send_matrix
 
 
 def main(driver, run_once):
     first_run = True
+    ledpi = LEDPi()
     while not run_once or first_run:
         first_run = False
-        matrix = display_clock()
+        matrix = ledpi.display_clock()
         if matrix:
             send_matrix(driver, matrix)
     time.sleep(3)
