@@ -130,13 +130,14 @@ def update_color(clock_info, now):
 
 def update_traffic(clock_info, now, api_client_pipe):
     # Only show traffic around the times I may be going to work
+    prev_show_traffic = clock_info.get('show_traffic')
     clock_info['show_traffic'] = (now.hour >= DIRECTIONS_START_HOUR and
                                   now.hour < DIRECTIONS_END_HOUR and
                                   now.isoweekday() <= 5)
-    if not clock_info['show_traffic']:
-        api_client_pipe.send(False)  # Disable API calling
-    else:
-        api_client_pipe.send(True)  # Enable API calling
+    if clock_info['show_traffic'] != prev_show_traffic:
+        # Only need to update the api client on a change
+        api_client_pipe.send(clock_info['show_traffic'])
+    if clock_info['show_traffic']:
         clock_info.setdefault('traffic', {})
         if api_client_pipe.poll():
             clock_info['traffic'] = api_client_pipe.recv()
