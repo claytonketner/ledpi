@@ -4,20 +4,21 @@ from clockpi.clockface_config import WEATHER_ANIMATIONS
 from clockpi.graphics.utils import add_to_matrix
 from clockpi.graphics.utils import config_to_matrix
 from clockpi.graphics.utils import generate_empty_matrix
-from clockpi.update_clock_info import update_clock_info
+from clockpi.update_clock_info import ClockInfoUpdater
 
 
 class LEDPi(object):
     def __init__(self, update_freq=0.0):
         self.update_freq = update_freq
         self.data = {}
+        self.clock_info_updater = ClockInfoUpdater()
 
     def display_clock(self):
         """
         Returns the current matrix to be displayed, or None, if the display
         shouldn't be updated right now.
         """
-        if not update_clock_info(self.data, self.update_freq):
+        if not self.clock_info_updater.run(self.data, self.update_freq):
             return None
         matrix = generate_empty_matrix()
         forecast_key = self.data.get('forecast_key')

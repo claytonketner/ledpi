@@ -1,77 +1,126 @@
 import googlemaps
+import re
 import requests
 from datetime import datetime
+from urlparse import urlparse
 
+from clockpi.constants import W_GOV_ICON_2_WEATHER
+from clockpi.constants import WEATHER_FORECAST_HOURS
 from clockpi.secret import DIRECTIONS_DESTINATION
 from clockpi.secret import DIRECTIONS_ORIGIN
 from clockpi.secret import GMAPS_DIRECTIONS_API_KEY
 from clockpi.secret import WU_ASTRO_URL
-from clockpi.secret import WU_FORECAST_URL
-from clockpi.secret import WU_WEATHER_URL
+from clockpi.secret import W_GOV_WEATHER_URL
 
 
-def get_weather(last_update_time, weather={}, cache_minutes=10):
+class APIClient(object):
+    """Base class for an API client.
     """
-    Gets weather via the Weather Underground (wunderground.com) API
-    cache_minutes should be >= 6 due to WU rate limits (because we're making
-    two requests each time)
-    """
-    now = datetime.now()
-    if last_update_time:
-        passed_minutes = (now - last_update_time).seconds/60
-    else:
-        passed_minutes = cache_minutes
-    if passed_minutes >= cache_minutes:
+    def __init__(self, mp_pipe):
+        """mp_pipe is a multiprocessing pipe used to transfer data.
+        Make sure to set `cache_minutes` so that you don't go over usage
+        limits!
+        """
+        self.mp_pipe = mp_pipe
+        self.cache_minutes = 10
+        self.last_update_time = None  # Datetime object
+        self.cleaned_data = {}  # Data from the API that has been cleaned
+        self.enabled = True  # Won't run if False
+
+    def run(self):
+        """The method to be called continuously. Handles keeping track of rate
+        limiting based on `cache_minutes` to avoid going over API usage limits.
+        Returns True if an update happened.
+        """
+        # Get data from the pipe, which will just be enable/disable
+        if self.mp_pipe.poll():
+            self.enabled = self.mp_pipe.recv()
+        if not self.enabled:
+            return False
+        now = datetime.now()
+        if self.last_update_time:
+            passed_minutes = (now - self.last_update_time).seconds/60
+        else:
+            passed_minutes = self.cache_minutes
+        if passed_minutes >= self.cache_minutes:
+            self.last_update_time = now
+            self.cleaned_data.update(self.call_api())
+            self.mp_pipe.send(self.cleaned_data)
+
+            return True
+        return False
+
+    def call_api(self):
+        """Override this in your child class. It should return a dict of
+        cleaned data from the API.
+        """
+        pass
+
+
+class WeatherAPIClient(APIClient):
+    def __init__(self, mp_pipe):
+        super(WeatherAPIClient, self).__init__(mp_pipe)
+        self.cache_minutes = 10
+
+    def call_api(self):
+        weather = {}
+        weather['error'] = False
         try:
-            wu_weather = requests.get(WU_WEATHER_URL).json()
-            wu_forecast = requests.get(WU_FORECAST_URL).json()
+            weather_json = requests.get(W_GOV_WEATHER_URL).json()
+            # List of hourly weather forecast. Index is number of hours
+            # into the future from now (0 = now, 1 = next hour, etc.)
+            hourly_weather = weather_json['properties']['periods']
+            weather['current_temp'] = int(hourly_weather[0]['temperature'])
+            print "Got current temp {}".format(weather['current_temp'])
+            weather['forecast'] = None
+            for hour_weather in hourly_weather[0:WEATHER_FORECAST_HOURS+1]:
+                # Find the most severe weather in this interval. Use the
+                # icon to determine the weather, because that's the most
+                # pared down. https://api.weather.gov/icons
+                forecast_icon_url = hour_weather['icon']
+                icon_re = re.compile('/[A-Za-z_]+$')
+                icon_path = urlparse(forecast_icon_url).path
+                # Retrieve the first result and strip off the matched slash
+                icon_name = icon_re.findall(icon_path)[0][1:]
+                matched_forecast = W_GOV_ICON_2_WEATHER[icon_name]
+                if weather.get('forecast') is None:
+                    weather['forecast'] = matched_forecast
+                else:
+                    # Replace the forecast with the more severe weather
+                    weather['forecast'] = max(weather['forecast'],
+                                              matched_forecast)
+            print "Got forecast {}".format(weather['forecast'])
+        except Exception as e:
+            print e.message
+            weather['error'] = True
+        try:
             wu_astro = requests.get(WU_ASTRO_URL).json()
-            current_weather = wu_weather['current_observation']
-            current_temp = current_weather['feelslike_f']
-            weather['current_temp'] = float(current_temp)
             sun_info = wu_astro['sun_phase']
             now = datetime.now()
-            weather['sunrise'] = datetime(now.year, now.month, now.day,
-                                          int(sun_info['sunrise']['hour']),
-                                          int(sun_info['sunrise']['minute']))
+            weather['sunrise'] = datetime(
+                now.year, now.month, now.day,
+                int(sun_info['sunrise']['hour']),
+                int(sun_info['sunrise']['minute']))
             weather['sunset'] = datetime(now.year, now.month, now.day,
                                          int(sun_info['sunset']['hour']),
                                          int(sun_info['sunset']['minute']))
-            todays_forecast = (wu_forecast['forecast']['txt_forecast']
-                               ['forecastday'][0])
-            # Weather forecast - look up 'phrase glossary' on wunderground's
-            # api website
-            forecast = todays_forecast['icon']
-            # Simplify down the possible weather states
-            if forecast in ('sunny', 'mostlysunny', 'clear'):
-                weather['forecast'] = 'clear'
-            elif forecast in ('partlycloudy', 'mostlycloudy', 'partlysunny'):
-                weather['forecast'] = 'partlycloudy'
-            elif forecast in ('cloudy', 'fog'):
-                weather['forecast'] = 'cloudy'
-            elif forecast in ('rain', 'flurries', 'sleet', 'snow', 'tstorms',
-                              'chancerain', 'chanceflurries', 'chancesleet',
-                              'chancesnow', 'chancetstorms'):
-                weather['forecast'] = 'rain'
-            else:
-                weather['forecast'] = None
         except Exception as e:
             print e.message
-            weather = {}
-        last_update_time = now
-    return last_update_time, weather
+            weather['error'] = True
+        return weather
 
 
-def get_traffic(last_update_time, traffic, cache_minutes=5):
-    # Google maps standard API allows 2500 requests/day, which is just over
-    # two per minute
-    now = datetime.now()
-    if last_update_time:
-        passed_minutes = (now - last_update_time).seconds/60
-    else:
-        passed_minutes = cache_minutes
-    if passed_minutes >= cache_minutes:
+class TrafficAPIClient(APIClient):
+    def __init__(self, mp_pipe):
+        # Google maps standard API allows 2500 requests/day, which is just over
+        # two per minute
+        super(TrafficAPIClient, self).__init__(mp_pipe)
+        self.cache_minutes = 5
+
+    def call_api(self):
+        traffic = {}
         directions = None
+        now = datetime.now()
         try:
             cl = googlemaps.Client(key=GMAPS_DIRECTIONS_API_KEY)
             directions = cl.directions(
@@ -97,5 +146,4 @@ def get_traffic(last_update_time, traffic, cache_minutes=5):
             else:
                 traffic['traffic_delta'] = 0
             traffic['travel_time'] = dur_in_traffic / 60
-        last_update_time = now
-    return last_update_time, traffic
+        return traffic

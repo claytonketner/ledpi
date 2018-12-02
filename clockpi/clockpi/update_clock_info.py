@@ -1,4 +1,6 @@
 from datetime import datetime
+from multiprocessing import Process
+from multiprocessing import Pipe
 
 from clockpi.constants import BLOOM_START_HOUR_OFFSET
 from clockpi.constants import BLOOM_END_HOUR_OFFSET
@@ -13,8 +15,9 @@ from clockpi.constants import DAILY_BRIGHTNESS_MAX
 from clockpi.constants import DEFAULT_SUNRISE_HOUR
 from clockpi.constants import DEFAULT_SUNSET_HOUR
 from clockpi.constants import SUN_ANIMATION_DURATION
-from clockpi.external import get_traffic
-from clockpi.external import get_weather
+from clockpi.enums import WeatherType
+from clockpi.external import WeatherAPIClient
+from clockpi.external import TrafficAPIClient
 from clockpi.graphics.color_utils import calc_color_cos
 from clockpi.graphics.color_utils import set_brightness
 from clockpi.secret import DIRECTIONS_END_HOUR
@@ -38,22 +41,33 @@ def update_time(clock_info, now):
         clock_info['hour_digits'][0] = 'BLANK'
 
 
-def update_weather(clock_info, now):
-    clock_info['weather_update_time'], clock_info['weather'] = get_weather(
-        clock_info.get('weather_update_time'), clock_info.get('weather', {}))
-    if clock_info.get('weather'):
+def update_weather(clock_info, now, api_client_pipe):
+    clock_info.setdefault('weather', {})
+    if api_client_pipe.poll():
+        clock_info['weather'] = api_client_pipe.recv()
+
+    current_temp = clock_info['weather'].get('current_temp')
+    if current_temp is None:
+        clock_info['temp_digits'] = ['E', 'R']
+    else:
         # Temp out of range
-        if (clock_info['weather']['current_temp'] > 99 or
-                clock_info['weather']['current_temp'] < 0):
+        if (current_temp > 99 or current_temp < 0):
             clock_info['temp_digits'] = ['SKULL']
         else:
             clock_info['temp_digits'] = map(
-                int, [clock_info['weather']['current_temp'] / 10 % 10,
-                      clock_info['weather']['current_temp'] % 10])
+                int, [current_temp / 10 % 10, current_temp % 10])
+    sunrise_time = clock_info['weather'].get('sunrise')
+    sunset_time = clock_info['weather'].get('sunset')
+    if (sunrise_time is None) or (sunset_time is None):
+        # Default to sundown because the bright clockface is annoying at night
+        clock_info['sun_is_up'] = False
+        clock_info['show_sunrise'] = False
+        clock_info['show_sunset'] = False
+    else:
         clock_info['sun_is_up'] = (clock_info['weather']['sunrise'] < now and
                                    clock_info['weather']['sunset'] > now)
         sunrise_anim_pct = (
-            1 - ((clock_info['weather']['sunrise'] - now).total_seconds() /
+            1 - ((sunrise_time - now).total_seconds() /
                  SUN_ANIMATION_DURATION))
         clock_info['sunrise_anim_pct'] = sunrise_anim_pct
         clock_info['show_sunrise'] = (sunrise_anim_pct > 0 and
@@ -64,33 +78,30 @@ def update_weather(clock_info, now):
         clock_info['sunset_anim_pct'] = sunset_anim_pct
         clock_info['show_sunset'] = (sunset_anim_pct > 0 and
                                      sunset_anim_pct < 1)
-        weather_forecast = clock_info['weather']['forecast']
+    weather_forecast = clock_info['weather'].get('forecast')
+    if not weather_forecast:
+        clock_info['forecast_key'] = None
+    else:
         if clock_info['sun_is_up']:
             # Day
-            if weather_forecast == 'clear':
+            if weather_forecast == WeatherType.CLEAR:
                 clock_info['forecast_key'] = 'sunny'
-            elif weather_forecast == 'partlycloudy':
+            elif weather_forecast == WeatherType.PARTLYCLOUDY:
                 clock_info['forecast_key'] = 'cloudy_sun'
-            elif weather_forecast == 'cloudy':
+            elif weather_forecast == WeatherType.CLOUDY:
                 clock_info['forecast_key'] = 'cloudy'
-            elif weather_forecast == 'rain':
+            elif weather_forecast == WeatherType.RAIN:
                 clock_info['forecast_key'] = 'rain'
         else:
             # Night
-            if weather_forecast == 'clear':
+            if weather_forecast == WeatherType.CLEAR:
                 clock_info['forecast_key'] = 'moon'
-            elif weather_forecast == 'partlycloudy':
+            elif weather_forecast == WeatherType.PARTLYCLOUDY:
                 clock_info['forecast_key'] = 'cloudy_moon'
-            elif weather_forecast == 'cloudy':
+            elif weather_forecast == WeatherType.CLOUDY:
                 clock_info['forecast_key'] = 'cloudy'
-            elif weather_forecast == 'rain':
+            elif weather_forecast == WeatherType.RAIN:
                 clock_info['forecast_key'] = 'rain'
-    else:
-        clock_info['temp_digits'] = ['E', 'R']
-        # Default to sundown because the bright clockface is annoying at night
-        clock_info['sun_is_up'] = False
-        clock_info['show_sunrise'] = False
-        clock_info['show_sunset'] = False
 
 
 def update_color(clock_info, now):
@@ -117,16 +128,19 @@ def update_color(clock_info, now):
                                          clock_info['brightness'])
 
 
-def update_traffic(clock_info, now):
+def update_traffic(clock_info, now, api_client_pipe):
     # Only show traffic around the times I may be going to work
     clock_info['show_traffic'] = (now.hour >= DIRECTIONS_START_HOUR and
                                   now.hour < DIRECTIONS_END_HOUR and
                                   now.isoweekday() <= 5)
-    if clock_info['show_traffic']:
-        clock_info['traffic_update_time'], clock_info['traffic'] = get_traffic(
-            clock_info.get('traffic_update_time'),
-            clock_info.get('traffic', {}))
-        if clock_info.get('traffic'):
+    if not clock_info['show_traffic']:
+        api_client_pipe.send(False)  # Disable API calling
+    else:
+        api_client_pipe.send(True)  # Enable API calling
+        clock_info.setdefault('traffic', {})
+        if api_client_pipe.poll():
+            clock_info['traffic'] = api_client_pipe.recv()
+        if clock_info['traffic']:
             clock_info['traffic_delta_digits'] = map(
                 int, [clock_info['traffic']['traffic_delta'] / 10 % 10,
                       clock_info['traffic']['traffic_delta'] % 10])
@@ -137,16 +151,28 @@ def update_traffic(clock_info, now):
                                   clock_info.get('traffic'))
 
 
-def update_clock_info(clock_info, update_freq):
-    now = datetime.now()
-    last_update = clock_info.get('last_update_time')
-    if last_update:
-        update_time_delta = now - last_update
-        if update_time_delta.total_seconds() < update_freq:
-            return False
-    clock_info['last_update_time'] = now
-    update_time(clock_info, now)
-    update_weather(clock_info, now)
-    update_color(clock_info, now)
-    update_traffic(clock_info, now)
-    return True
+class ClockInfoUpdater(object):
+    def __init__(self):
+        self.weather_parent_pipe, weather_child_pipe = Pipe()
+        weather = WeatherAPIClient(weather_child_pipe)
+        self.weather_api_client = Process(target=weather.run)
+        self.weather_api_client.start()
+
+        self.traffic_parent_pipe, traffic_child_pipe = Pipe()
+        traffic = TrafficAPIClient(traffic_child_pipe)
+        self.traffic_api_client = Process(target=traffic.run)
+        self.traffic_api_client.start()
+
+    def run(self, clock_info, update_freq):
+        now = datetime.now()
+        last_update = clock_info.get('last_update_time')
+        if last_update:
+            update_time_delta = now - last_update
+            if update_time_delta.total_seconds() < update_freq:
+                return False
+        clock_info['last_update_time'] = now
+        update_time(clock_info, now)
+        update_weather(clock_info, now, self.weather_parent_pipe)
+        update_color(clock_info, now)
+        update_traffic(clock_info, now, self.traffic_parent_pipe)
+        return True
