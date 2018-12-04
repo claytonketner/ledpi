@@ -78,20 +78,26 @@ class WeatherAPIClient(APIClient):
                 # icon to determine the weather, because that's the most
                 # pared down. https://api.weather.gov/icons
                 forecast_icon_url = hour_weather['icon']
-                icon_re = re.compile('/[A-Za-z_]+$')
                 icon_path = urlparse(forecast_icon_url).path
-                # Retrieve the first result and strip off the matched slash
-                icon_name = icon_re.findall(icon_path)[0][1:]
-                matched_forecast = W_GOV_ICON_2_WEATHER[icon_name]
-                if weather.get('forecast') is None:
-                    weather['forecast'] = matched_forecast
-                else:
-                    # Replace the forecast with the more severe weather
-                    weather['forecast'] = max(weather['forecast'],
-                                              matched_forecast)
+                # Sometimes, the icon path will have a comma and a number after
+                # like: /icons/land/night/rain_showers,20
+                icon_re = re.compile('/[A-Za-z_]+')
+                re_matches = icon_re.findall(icon_path)
+                if re_matches:
+                    # Icon name will be the last match. Also, strip off the
+                    # leading slash from the regex match
+                    icon_name = re_matches[-1][1:]
+                    matched_forecast = W_GOV_ICON_2_WEATHER[icon_name]
+                    if weather.get('forecast'):
+                        # Replace the forecast with the more severe weather
+                        weather['forecast'] = max(weather['forecast'],
+                                                  matched_forecast)
+                    else:
+                        # First valid forecast
+                        weather['forecast'] = matched_forecast
             print "Got forecast {}".format(weather['forecast'])
         except Exception as e:
-            print e.message
+            print "Exception during weather API call: {}".format(e)
             weather['error'] = True
         try:
             wu_astro = requests.get(WU_ASTRO_URL).json()
@@ -105,7 +111,7 @@ class WeatherAPIClient(APIClient):
                                          int(sun_info['sunset']['hour']),
                                          int(sun_info['sunset']['minute']))
         except Exception as e:
-            print e.message
+            print "Exception during astro API call: {}".format(e)
             weather['error'] = True
         return weather
 
@@ -129,7 +135,7 @@ class TrafficAPIClient(APIClient):
                 mode='driving',
                 departure_time=now)
         except Exception as e:
-            print e.message
+            print "Exception during traffic API call: {}".format(e)
             traffic = {}
         if directions:
             # Only one destination, so just extract the first leg
