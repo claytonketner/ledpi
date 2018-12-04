@@ -116,15 +116,15 @@ WEATHER_ANIMATIONS = {
         ('rain_animation', {
             'spatial': {
                 'origin_x': 1,
-                'origin_y': 8,
+                'origin_y': 6,
             },
-            'procedural_animation': ProceduralRain(38, 24),
+            'procedural_animation': ProceduralRain(38, 32),
             'color': [30, 172, 255],
         }),
         ('cloud_1', {
             'spatial': {
-                'center_x': 18,
-                'center_y': 8,
+                'center_x': 20,
+                'origin_y': 1,
             },
             'item': weather_animations.CLOUD_LONG,
             'color': [255, 255, 255],
@@ -172,7 +172,7 @@ PLAIN_CLOCKFACE = {
         'data_key': 'temp_digits',
         'spatial': {
             'center_x': 19,
-            'center_y': 8,
+            'origin_y': 5,
             'spacing': 1,
         },
         'font_choices': [numbers_tiny, letters_tiny, glyphs],
@@ -181,7 +181,7 @@ PLAIN_CLOCKFACE = {
         'item': glyphs.DEGREE,
         'spatial': {
             'origin_x': 24,
-            'origin_y': 5,
+            'origin_y': 4,
         },
     },
 }
