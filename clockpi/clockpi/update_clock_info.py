@@ -149,7 +149,7 @@ def update_traffic(clock_info, now, api_client_pipe):
                 int, [clock_info['traffic']['travel_time'] / 10 % 10,
                       clock_info['traffic']['travel_time'] % 10])
     clock_info['show_traffic'] = (clock_info['show_traffic'] and
-                                  clock_info.get('traffic'))
+                                  bool(clock_info.get('traffic')))
 
 
 class ClockInfoUpdater(object):

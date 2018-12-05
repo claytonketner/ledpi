@@ -44,9 +44,9 @@ class APIClient(object):
             passed_minutes = self.cache_minutes
         if passed_minutes >= self.cache_minutes:
             self.last_update_time = now
-            self.cleaned_data.update(self.call_api())
+            new_data = self.call_api()
+            self.cleaned_data.update(new_data)
             self.mp_pipe.send(self.cleaned_data)
-
             return True
         return False
 
