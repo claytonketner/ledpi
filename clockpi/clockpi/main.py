@@ -22,7 +22,9 @@ def main(driver, run_once):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] in %(funcName)s: %(message)s')
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-once', action='store_true')

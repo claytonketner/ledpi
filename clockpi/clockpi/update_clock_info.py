@@ -160,12 +160,12 @@ class ClockInfoUpdater(object):
     def __init__(self):
         self.weather_parent_pipe, weather_child_pipe = Pipe()
         weather = WeatherAPIClient(weather_child_pipe)
-        self.weather_api_client = Process(target=weather.run)
+        self.weather_api_client = Process(target=weather.run_forever)
         self.weather_api_client.start()
 
         self.traffic_parent_pipe, traffic_child_pipe = Pipe()
         traffic = TrafficAPIClient(traffic_child_pipe)
-        self.traffic_api_client = Process(target=traffic.run)
+        self.traffic_api_client = Process(target=traffic.run_forever)
         self.traffic_api_client.start()
 
     def run(self, clock_info, update_freq):

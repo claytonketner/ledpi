@@ -31,6 +31,11 @@ class APIClient(object):
         self.cleaned_data = {}  # Data from the API that has been cleaned
         self.enabled = True  # Won't run if False
 
+    def run_forever(self):
+        """Calls `run` forever"""
+        while True:
+            self.run()
+
     def run(self):
         """The method to be called continuously. Handles keeping track of rate
         limiting based on `cache_minutes` to avoid going over API usage limits.
@@ -39,16 +44,16 @@ class APIClient(object):
         # Get data from the pipe, which will just be enable/disable
         if self.mp_pipe.poll():
             self.enabled = self.mp_pipe.recv()
-            logger.info("API client received {}".format(self.enabled))
         if not self.enabled:
             return False
         now = datetime.now()
         if self.last_update_time:
-            passed_minutes = (now - self.last_update_time).seconds/60
+            passed_minutes = (now - self.last_update_time).seconds / 60
         else:
             passed_minutes = self.cache_minutes
         if passed_minutes >= self.cache_minutes:
             self.last_update_time = now
+            logger.info("Calling API client {}".format(self))
             new_data = self.call_api()
             self.cleaned_data.update(new_data)
             self.mp_pipe.send(self.cleaned_data)
@@ -159,4 +164,5 @@ class TrafficAPIClient(APIClient):
             else:
                 traffic['traffic_delta'] = 0
             traffic['travel_time'] = dur_in_traffic / 60
+            logger.info("Got travel time {}".format(traffic['travel_time']))
         return traffic
