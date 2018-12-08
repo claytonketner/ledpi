@@ -9,6 +9,7 @@ from clockpi.alphanum import weather_animations
 from clockpi.procedural_animations import ProceduralRain
 
 
+CLOUD_COLOR = [100, 100, 100]
 """
 Clockface configuration information. A certain configuration consists of dict
 of inner dicts that describe what should be displayed and where, along with
@@ -60,7 +61,7 @@ WEATHER_ANIMATIONS = {
                 'center_y': 8,
             },
             'item': weather_animations.CLOUD_LONG,
-            'color': [255, 255, 255],
+            'color': CLOUD_COLOR,
             'mask': True,
         },
     },
@@ -79,7 +80,7 @@ WEATHER_ANIMATIONS = {
                 'center_y': 14,
             },
             'font': weather_animations.CLOUDY_ANIMATION_LATERAL,
-            'color': [255, 255, 255],
+            'color': CLOUD_COLOR,
             'mask': True,
          }),
         ('cloudy_animation_2', {
@@ -88,7 +89,7 @@ WEATHER_ANIMATIONS = {
                 'center_y': 12,
             },
             'font': weather_animations.CLOUDY_ANIMATION_UP_DOWN,
-            'color': [255, 255, 255],
+            'color': CLOUD_COLOR,
             'mask': True,
          }),
     )),
@@ -99,7 +100,7 @@ WEATHER_ANIMATIONS = {
                 'center_y': 8,
             },
             'item': weather_animations.CLOUD_LONG,
-            'color': [255, 255, 255],
+            'color': CLOUD_COLOR,
             'mask': True,
          }),
         ('moon', {
@@ -124,10 +125,10 @@ WEATHER_ANIMATIONS = {
         ('cloud_1', {
             'spatial': {
                 'center_x': 20,
-                'origin_y': 1,
+                'center_y': 8,
             },
             'item': weather_animations.CLOUD_LONG,
-            'color': [255, 255, 255],
+            'color': CLOUD_COLOR,
             'mask': True,
          }),
     )),
@@ -172,7 +173,7 @@ PLAIN_CLOCKFACE = {
         'data_key': 'temp_digits',
         'spatial': {
             'center_x': 19,
-            'origin_y': 5,
+            'origin_y': 6,
             'spacing': 1,
         },
         'font_choices': [numbers_tiny, letters_tiny, glyphs],
@@ -181,7 +182,7 @@ PLAIN_CLOCKFACE = {
         'item': glyphs.DEGREE,
         'spatial': {
             'origin_x': 24,
-            'origin_y': 4,
+            'origin_y': 5,
         },
     },
 }

@@ -135,6 +135,7 @@ def update_traffic(clock_info, now, api_client_pipe):
                                   now.hour < DIRECTIONS_END_HOUR and
                                   now.isoweekday() <= 5)
     if clock_info['show_traffic'] != prev_show_traffic:
+        print "Sending traffic client {}".format(clock_info['show_traffic'])
         # Only need to update the api client on a change
         api_client_pipe.send(clock_info['show_traffic'])
     if clock_info['show_traffic']:
@@ -148,8 +149,6 @@ def update_traffic(clock_info, now, api_client_pipe):
             clock_info['travel_time_digits'] = map(
                 int, [clock_info['traffic']['travel_time'] / 10 % 10,
                       clock_info['traffic']['travel_time'] % 10])
-    clock_info['show_traffic'] = (clock_info['show_traffic'] and
-                                  bool(clock_info.get('traffic')))
 
 
 class ClockInfoUpdater(object):

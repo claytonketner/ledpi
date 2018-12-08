@@ -30,7 +30,7 @@ class LEDPi(object):
                 weather_config, self.data,
                 brightness=self.data['brightness'], bit_or=False)
             add_to_matrix(weather_matrix, matrix, 0, 0, transpose=False)
-        if self.data['show_traffic']:
+        if self.data['show_traffic'] and self.data.get('traffic'):
             clockface = config_to_matrix(TRAFFIC_CLOCKFACE, self.data,
                                          color=self.data['color'])
         else:
