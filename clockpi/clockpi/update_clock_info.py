@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from multiprocessing import Process
 from multiprocessing import Pipe
@@ -22,6 +23,9 @@ from clockpi.graphics.color_utils import calc_color_cos
 from clockpi.graphics.color_utils import set_brightness
 from clockpi.secret import DIRECTIONS_END_HOUR
 from clockpi.secret import DIRECTIONS_START_HOUR
+
+
+logger = logging.getLogger(__name__)
 
 
 def update_time(clock_info, now):
@@ -135,7 +139,8 @@ def update_traffic(clock_info, now, api_client_pipe):
                                   now.hour < DIRECTIONS_END_HOUR and
                                   now.isoweekday() <= 5)
     if clock_info['show_traffic'] != prev_show_traffic:
-        print "Sending traffic client {}".format(clock_info['show_traffic'])
+        logger.info("Sending traffic client {}".format(
+                    clock_info['show_traffic']))
         # Only need to update the api client on a change
         api_client_pipe.send(clock_info['show_traffic'])
     if clock_info['show_traffic']:

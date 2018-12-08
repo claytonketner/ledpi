@@ -1,4 +1,5 @@
 import googlemaps
+import logging
 import re
 import requests
 from datetime import datetime
@@ -11,6 +12,9 @@ from clockpi.secret import DIRECTIONS_ORIGIN
 from clockpi.secret import GMAPS_DIRECTIONS_API_KEY
 from clockpi.secret import WU_ASTRO_URL
 from clockpi.secret import W_GOV_WEATHER_URL
+
+
+logger = logging.getLogger(__name__)
 
 
 class APIClient(object):
@@ -35,6 +39,7 @@ class APIClient(object):
         # Get data from the pipe, which will just be enable/disable
         if self.mp_pipe.poll():
             self.enabled = self.mp_pipe.recv()
+            logger.info("API client received {}".format(self.enabled))
         if not self.enabled:
             return False
         now = datetime.now()
@@ -71,7 +76,7 @@ class WeatherAPIClient(APIClient):
             # into the future from now (0 = now, 1 = next hour, etc.)
             hourly_weather = weather_json['properties']['periods']
             weather['current_temp'] = int(hourly_weather[0]['temperature'])
-            print "Got current temp {}".format(weather['current_temp'])
+            logger.info("Got current temp {}".format(weather['current_temp']))
             weather['forecast'] = None
             for hour_weather in hourly_weather[0:WEATHER_FORECAST_HOURS+1]:
                 # Find the most severe weather in this interval. Use the
@@ -95,9 +100,9 @@ class WeatherAPIClient(APIClient):
                     else:
                         # First valid forecast
                         weather['forecast'] = matched_forecast
-            print "Got forecast {}".format(weather['forecast'])
-        except Exception as e:
-            print "Exception during weather API call: {}".format(e)
+            logger.info("Got forecast {}".format(weather['forecast']))
+        except Exception:
+            logger.exception('Exception during weather API call.')
             weather['error'] = True
         try:
             wu_astro = requests.get(WU_ASTRO_URL).json()
@@ -110,8 +115,10 @@ class WeatherAPIClient(APIClient):
             weather['sunset'] = datetime(now.year, now.month, now.day,
                                          int(sun_info['sunset']['hour']),
                                          int(sun_info['sunset']['minute']))
-        except Exception as e:
-            print "Exception during astro API call: {}".format(e)
+            logger.info("Got sunrise {} and sunset {}".format(
+                        weather['sunrise'], weather['sunset']))
+        except Exception:
+            logger.exception('Exception during astro API call.')
             weather['error'] = True
         return weather
 
@@ -134,8 +141,8 @@ class TrafficAPIClient(APIClient):
                 DIRECTIONS_DESTINATION,
                 mode='driving',
                 departure_time=now)
-        except Exception as e:
-            print "Exception during traffic API call: {}".format(e)
+        except Exception:
+            logger.exception('Exception during traffic API call')
             traffic = {}
         if directions:
             # Only one destination, so just extract the first leg

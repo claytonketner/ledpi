@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import logging
 import time
 
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
@@ -21,6 +22,8 @@ def main(driver, run_once):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-once', action='store_true')
     args = parser.parse_args()
