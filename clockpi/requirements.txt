@@ -1,6 +1,7 @@
 enum34==1.1.6
 googlemaps==2.5.1
 Pillow==4.0.0
+python-dateutil==2.8.0
 
 # Run these in a clone of https://github.com/hzeller/rpi-rgb-led-matrix
 # make build-python

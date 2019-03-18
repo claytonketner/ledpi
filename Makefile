@@ -1,4 +1,4 @@
-TARGET=clayton@10.0.0.13
+TARGET=clayton@192.168.1.10
 DIR=~/ledpi
 
 

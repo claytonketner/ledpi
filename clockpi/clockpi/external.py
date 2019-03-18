@@ -3,6 +3,8 @@ import logging
 import re
 import requests
 from datetime import datetime
+from dateutil import tz
+from dateutil.parser import parse as dateutil_parse
 from urlparse import urlparse
 
 from clockpi.constants import W_GOV_ICON_2_WEATHER
@@ -10,7 +12,7 @@ from clockpi.constants import WEATHER_FORECAST_HOURS
 from clockpi.secret import DIRECTIONS_DESTINATION
 from clockpi.secret import DIRECTIONS_ORIGIN
 from clockpi.secret import GMAPS_DIRECTIONS_API_KEY
-from clockpi.secret import WU_ASTRO_URL
+from clockpi.secret import ASTRO_API_URL
 from clockpi.secret import W_GOV_WEATHER_URL
 
 
@@ -110,16 +112,15 @@ class WeatherAPIClient(APIClient):
             logger.exception('Exception during weather API call.')
             weather['error'] = True
         try:
-            wu_astro = requests.get(WU_ASTRO_URL).json()
-            sun_info = wu_astro['sun_phase']
-            now = datetime.now()
-            weather['sunrise'] = datetime(
-                now.year, now.month, now.day,
-                int(sun_info['sunrise']['hour']),
-                int(sun_info['sunrise']['minute']))
-            weather['sunset'] = datetime(now.year, now.month, now.day,
-                                         int(sun_info['sunset']['hour']),
-                                         int(sun_info['sunset']['minute']))
+            astro_args = {'formatted': 0}  # Get a full date/time string
+            astro_json = requests.get(ASTRO_API_URL, params=astro_args).json()
+            sunrise_str = astro_json['results']['sunrise']
+            sunset_str = astro_json['results']['sunset']
+            local_tz = tz.tzlocal()
+            sunrise = dateutil_parse(sunrise_str).astimezone(local_tz)
+            sunset = dateutil_parse(sunset_str).astimezone(local_tz)
+            weather['sunrise'] = sunrise
+            weather['sunset'] = sunset
             logger.info("Got sunrise {} and sunset {}".format(
                         weather['sunrise'], weather['sunset']))
         except Exception:

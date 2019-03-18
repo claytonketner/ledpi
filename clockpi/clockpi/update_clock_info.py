@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from dateutil import tz
 from multiprocessing import Process
 from multiprocessing import Pipe
 
@@ -169,7 +170,7 @@ class ClockInfoUpdater(object):
         self.traffic_api_client.start()
 
     def run(self, clock_info, update_freq):
-        now = datetime.now()
+        now = datetime.now(tz.tzlocal())
         last_update = clock_info.get('last_update_time')
         if last_update:
             update_time_delta = now - last_update
