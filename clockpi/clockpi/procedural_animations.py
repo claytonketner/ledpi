@@ -1,6 +1,8 @@
 import random
 import time
 
+from clockpi.graphics.color_utils import set_brightness
+
 
 class ProceduralAnimation(object):
     ANIMATION_FREQ = 1  # Hz
@@ -37,11 +39,13 @@ class ProceduralRain(ProceduralAnimation):
     """
     DROPLET_DENSITY = 0.12  # Average number of droplets per pixel
     DROPLET_LENGTH = 2  # Vertical length of droplets
+    DROPLET_TAIL_BRIGHTNESS = 0.2
 
-    def __init__(self, animation_width, animation_height):
+    def __init__(self, animation_width, animation_height, color):
         super(ProceduralRain, self).__init__()
         self.animation_width = animation_width
         self.animation_height = animation_height
+        self.color = color
         self.current_frame = []
         # Generate a blank frame
         for _ in xrange(self.animation_height):
@@ -64,5 +68,9 @@ class ProceduralRain(ProceduralAnimation):
                 # Draw the droplet downwards
                 for yy in xrange(self.DROPLET_LENGTH):
                     if yy < self.animation_height:
-                        self.current_frame[yy][xx] = 1
+                        self.current_frame[yy][xx] = (set_brightness(
+                            self.color,
+                            self.DROPLET_TAIL_BRIGHTNESS**(
+                                self.DROPLET_LENGTH-yy-1),
+                            as_percentage=True))
         return self.current_frame

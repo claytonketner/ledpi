@@ -119,8 +119,7 @@ WEATHER_ANIMATIONS = {
                 'origin_x': 1,
                 'origin_y': 6,
             },
-            'procedural_animation': ProceduralRain(38, 32),
-            'color': [30, 172, 255],
+            'procedural_animation': ProceduralRain(38, 32, [30, 172, 255]),
         }),
         ('cloud_1', {
             'spatial': {
