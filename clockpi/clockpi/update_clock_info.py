@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from dateutil import tz
 from multiprocessing import Process
 from multiprocessing import Pipe
 
@@ -104,9 +103,9 @@ def update_weather(clock_info, now, api_client_pipe):
             elif weather_forecast == WeatherType.PARTLYCLOUDY:
                 clock_info['forecast_key'] = 'cloudy_moon'
             elif weather_forecast == WeatherType.CLOUDY:
-                clock_info['forecast_key'] = 'cloudy'
+                clock_info['forecast_key'] = 'cloudy_moon'
             elif weather_forecast == WeatherType.RAIN:
-                clock_info['forecast_key'] = 'rain'
+                clock_info['forecast_key'] = 'rain_moon'
 
 
 def update_color(clock_info, now):
@@ -170,7 +169,7 @@ class ClockInfoUpdater(object):
         self.traffic_api_client.start()
 
     def run(self, clock_info, update_freq):
-        now = datetime.now(tz.tzlocal())
+        now = datetime.now()
         last_update = clock_info.get('last_update_time')
         if last_update:
             update_time_delta = now - last_update

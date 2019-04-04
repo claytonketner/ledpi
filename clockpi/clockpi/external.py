@@ -117,8 +117,15 @@ class WeatherAPIClient(APIClient):
             sunrise_str = astro_json['results']['sunrise']
             sunset_str = astro_json['results']['sunset']
             local_tz = tz.tzlocal()
-            sunrise = dateutil_parse(sunrise_str).astimezone(local_tz)
-            sunset = dateutil_parse(sunset_str).astimezone(local_tz)
+            # Since we only can get the UTC sunrise/sunset, it may be for the
+            # next day, so convert it to the current day
+            now = datetime.now()
+            sunrise_utc = dateutil_parse(sunrise_str).astimezone(local_tz)
+            sunrise = datetime.combine(date=now.date(),
+                                       time=sunrise_utc.time())
+            sunset_utc = dateutil_parse(sunset_str).astimezone(local_tz)
+            sunset = datetime.combine(date=now.date(),
+                                      time=sunset_utc.time())
             weather['sunrise'] = sunrise
             weather['sunset'] = sunset
             logger.info("Got sunrise {} and sunset {}".format(

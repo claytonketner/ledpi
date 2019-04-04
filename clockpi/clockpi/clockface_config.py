@@ -100,7 +100,6 @@ WEATHER_ANIMATIONS = {
                 'center_y': 8,
             },
             'item': weather_animations.CLOUD_LONG,
-            'color': CLOUD_COLOR,
             'mask': True,
          }),
         ('moon', {
@@ -129,6 +128,33 @@ WEATHER_ANIMATIONS = {
             },
             'item': weather_animations.CLOUD_LONG,
             'color': CLOUD_COLOR,
+            'mask': True,
+         }),
+    )),
+    'rain_moon': OrderedDict((
+        ('rain_animation', {
+            'spatial': {
+                'origin_x': 1,
+                'origin_y': 6,
+            },
+            'procedural_animation': ProceduralRain(38, 32),
+            'color': [30, 172, 255],
+        }),
+        ('cloud_1', {
+            'spatial': {
+                'center_x': 20,
+                'center_y': 8,
+            },
+            'item': weather_animations.CLOUD_LONG,
+            'mask': True,
+         }),
+        ('moon', {
+            'spatial': {
+                'center_x': 19,
+                'center_y': 9,
+            },
+            'item': weather_animations.MOON_LARGE,
+            'color': [244, 188, 66],
             'mask': True,
          }),
     )),
